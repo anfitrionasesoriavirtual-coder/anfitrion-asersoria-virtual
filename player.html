@@ -538,29 +538,32 @@ onValue(ref(db, 'cmd'), async (snap) => {
     const doLoop = async () => {
       if (loopTimer === null) return;
       set(ref(db, 'state/playing'), true);
-      await playAudio(profileId, '🔁 ' + name, mime, host, () => {
+      // Use the actual name (without emoji prefix) for fetching audio
+      await playAudio(profileId, name, mime, host, () => {
         set(ref(db, 'state/playing'), false);
         loopTimer = setTimeout(doLoop, ms);
       });
     };
 
-    // Fix: loop timing starts from when audio STARTS, not ends
-    loopTimer = true;
+    loopTimer = true; // sentinel so doLoop knows it's active
     doLoop();
 
   } else if (action === 'pause') {
     if (currentAudio) {
       currentAudio.pause();
-      const cleanName = npText.textContent;
+      // Get the current clean name before any mutation
+      const cleanName = npText.textContent.replace(/^⏸\s*/, '');
       setPlaying(cleanName, '', false);
       npText.textContent = '⏸ ' + cleanName;
       set(ref(db, 'state/playing'), false);
+      set(ref(db, 'state/paused'), true);
     }
 
   } else if (action === 'resume') {
     if (currentAudio) {
       currentAudio.play().catch(e => showError('Error al reanudar: ' + e.message));
       set(ref(db, 'state/playing'), true);
+      set(ref(db, 'state/paused'), false);
       waveform.classList.add('active');
       card.classList.add('playing');
     }

@@ -177,6 +177,17 @@ body::before{
 }
 .profile-card:hover .pc-avatar{transform:scale(1.08)}
 
+.pc-delete{
+  position:absolute;top:8px;right:8px;
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(255,79,106,.15);border:1px solid rgba(255,79,106,.3);
+  color:var(--red);font-size:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s;
+  z-index:2;
+}
+.profile-card:hover .pc-delete{opacity:1}
+
 .pc-online{
   position:absolute;top:2px;right:2px;
   width:12px;height:12px;border-radius:50%;
@@ -705,15 +716,45 @@ function renderQR() {
 }
 renderQR();
 
-// ── PROFILES ───────────────────────────────────────────
-function loadProfiles() {
-  try { profiles = JSON.parse(localStorage.getItem('utpl_profiles') || '[]'); }
-  catch { profiles = []; }
+// ── PROFILES (Firebase-synced) ─────────────────────────
+async function loadProfiles() {
+  // Show loading hint in grid while fetching from Firebase
+  const grid = document.getElementById('profiles-grid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;padding:1.5rem">⏳ Cargando perfiles…</div>';
+  try {
+    const snap = await get(ref(db, 'profiles'));
+    const val = snap.val();
+    if (val && typeof val === 'object') {
+      profiles = Object.values(val);
+    } else {
+      // Migrate from localStorage if Firebase is empty
+      const local = JSON.parse(localStorage.getItem('utpl_profiles') || '[]');
+      if (local.length) {
+        profiles = local;
+        await saveProfiles(); // push to Firebase
+        localStorage.removeItem('utpl_profiles'); // cleanup
+      } else {
+        profiles = [];
+      }
+    }
+  } catch(e) {
+    console.warn('loadProfiles Firebase error, falling back to localStorage', e);
+    try { profiles = JSON.parse(localStorage.getItem('utpl_profiles') || '[]'); }
+    catch { profiles = []; }
+  }
   renderProfiles();
 }
 
-function saveProfiles() {
-  localStorage.setItem('utpl_profiles', JSON.stringify(profiles));
+async function saveProfiles() {
+  // Store as object keyed by profile id
+  const obj = {};
+  profiles.forEach(p => { obj[p.id] = p; });
+  try {
+    await set(ref(db, 'profiles'), obj);
+  } catch(e) {
+    console.warn('saveProfiles Firebase error, falling back to localStorage', e);
+    localStorage.setItem('utpl_profiles', JSON.stringify(profiles));
+  }
 }
 
 function renderProfiles() {
@@ -721,10 +762,14 @@ function renderProfiles() {
   grid.innerHTML = '';
   const lastId = localStorage.getItem('utpl_last_profile');
 
-  profiles.forEach(p => {
+  // Sort by lastActive desc so most recent appears first
+  const sorted = [...profiles].sort((a,b) => (b.lastActive||0)-(a.lastActive||0));
+
+  sorted.forEach(p => {
     const card = document.createElement('div');
     card.className = 'profile-card' + (p.id === lastId ? ' last-used' : '');
     card.innerHTML = `
+      <button class="pc-delete" title="Eliminar perfil" onclick="deleteProfile(event,'${p.id}')">✕</button>
       <div class="pc-avatar" style="background:${p.color}18">
         ${p.icon}
         <div class="pc-online ${p.id === lastId ? 'on' : 'off'}"></div>
@@ -754,7 +799,7 @@ window.hideNewProfileForm = () => {
   document.getElementById('new-name').value = '';
 };
 
-window.createProfile = () => {
+window.createProfile = async () => {
   const name = document.getElementById('new-name').value.trim();
   if (!name) return;
   const profile = {
@@ -764,12 +809,23 @@ window.createProfile = () => {
     totalSize: 0, lastActive: Date.now(), audios: []
   };
   profiles.push(profile);
-  saveProfiles();
+  await saveProfiles();
   hideNewProfileForm();
   renderProfiles();
 };
 
-function selectProfile(id) {
+window.deleteProfile = async (e, id) => {
+  e.stopPropagation();
+  const p = profiles.find(x => x.id === id);
+  if (!p) return;
+  if (!confirm(`¿Eliminar el perfil "${p.name}" y todos sus audios?`)) return;
+  // Remove from Firebase audio store
+  try { await remove(ref(db, `audio/${id}`)); } catch(e) {}
+  profiles = profiles.filter(x => x.id !== id);
+  if (localStorage.getItem('utpl_last_profile') === id) localStorage.removeItem('utpl_last_profile');
+  await saveProfiles();
+  renderProfiles();
+};
   const p = profiles.find(x => x.id === id);
   if (!p) return;
   currentProfile = p;
@@ -816,14 +872,14 @@ window.goBackToProfiles = () => {
   activeLoopName = null;
 };
 
-function saveCurrentProfile() {
+async function saveCurrentProfile() {
   if (!currentProfile) return;
   const idx = profiles.findIndex(p => p.id === currentProfile.id);
   if (idx === -1) return;
   const totalSize = audios.reduce((s, a) => s + (a.size || 0), 0);
   profiles[idx] = { ...currentProfile, audios: audios.map(a => ({ ...a })), totalSize, lastActive: Date.now() };
   currentProfile = profiles[idx];
-  saveProfiles();
+  await saveProfiles();
 }
 
 // ── AUTO-RESTORE ──────────────────────────────────────
@@ -832,6 +888,29 @@ function autoRestore() {
   if (!lastId) return;
   const p = profiles.find(x => x.id === lastId);
   if (p) setTimeout(() => selectProfile(p.id), 100);
+}
+
+// ── REAL-TIME PROFILE SYNC ────────────────────────────
+// Listen for profile changes made on other devices
+let profileSyncActive = false;
+function startProfileSync() {
+  if (profileSyncActive) return;
+  profileSyncActive = true;
+  onValue(ref(db, 'profiles'), (snap) => {
+    // Skip if we're currently inside a profile (avoid interrupting work)
+    if (currentProfile) return;
+    const val = snap.val();
+    if (val && typeof val === 'object') {
+      const remoteProfiles = Object.values(val);
+      // Only update if data actually changed (compare by count + ids)
+      const localIds = profiles.map(p=>p.id).sort().join();
+      const remoteIds = remoteProfiles.map(p=>p.id).sort().join();
+      if (localIds !== remoteIds || JSON.stringify(profiles) !== JSON.stringify(remoteProfiles)) {
+        profiles = remoteProfiles;
+        renderProfiles();
+      }
+    }
+  });
 }
 
 // ── STORAGE UTILS ─────────────────────────────────────
@@ -1236,11 +1315,11 @@ window.sendCmd = async function(action, audioObj = null, extra = {}) {
 };
 
 // ── INIT ───────────────────────────────────────────────
-// Hide splash after 1.5s
-setTimeout(() => {
+setTimeout(async () => {
   document.getElementById('splash').classList.add('hidden');
   document.getElementById('profile-screen').style.display = 'block';
-  loadProfiles();
+  await loadProfiles();
+  startProfileSync(); // listen for real-time profile changes from other devices
   autoRestore();
 }, 1500);
 </script>
