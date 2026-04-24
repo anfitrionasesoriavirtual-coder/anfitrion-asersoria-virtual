@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Player — Asesorías UTPL</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --s1: #0f0f1a;
+  --s2: #161625;
+  --s3: #1e1e30;
+  --border: #ffffff0f;
+  --border2: #ffffff18;
+  --accent: #7c6bff;
+  --accent2: #a78bfa;
+  --glow: rgba(124,107,255,.25);
+  --green: #10d4a0;
+  --green-glow: rgba(16,212,160,.3);
+  --red: #ff4f6a;
+  --muted: #6a6a88;
+  --muted2: #4a4a66;
+  --text: #f0f0f8;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1.2rem;
+  padding:2rem 1.5rem;
+  overflow-x:hidden;
+}
+
+/* Background */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 20%, rgba(124,107,255,.1) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 60% at 85% 80%, rgba(16,212,160,.07) 0%, transparent 65%);
+  pointer-events:none;z-index:0;
+}
+
+/* All children above bg */
+body > *{position:relative;z-index:1}
+
+/* ─── HEADER ─── */
+.sys-header{
+  text-align:center;
+  animation:fadeUp .6s ease both;
+}
+.sys-logo{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:52px;height:52px;border-radius:16px;
+  background:linear-gradient(135deg,var(--accent),var(--green));
+  font-size:1.6rem;margin-bottom:.6rem;
+  box-shadow:0 8px 30px var(--glow);
+}
+.sys-title{font-size:.82rem;color:var(--muted);font-weight:400;letter-spacing:.02em}
+
+/* ─── STATUS PILL ─── */
+.status-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:99px;padding:.5rem 1rem;
+  font-size:.8rem;color:var(--muted);
+  animation:fadeUp .6s .1s ease both;
+  transition:all .3s;
+}
+
+#status-dot{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--red);flex-shrink:0;
+  transition:background .3s;
+}
+#status-dot.ok{
+  background:var(--green);
+  box-shadow:0 0 10px var(--green);
+  animation:pulse 2s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ─── NOW PLAYING CARD ─── */
+#now-playing-card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:2rem 2rem 1.8rem;
+  text-align:center;
+  width:min(380px,100%);
+  position:relative;overflow:hidden;
+  animation:fadeUp .6s .2s ease both;
+  transition:border-color .4s, box-shadow .4s;
+}
+
+/* Top gradient line */
+#now-playing-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--green));
+  opacity:0;transition:opacity .5s;
+}
+#now-playing-card.playing{
+  border-color:rgba(124,107,255,.25);
+  box-shadow:0 0 60px rgba(124,107,255,.1), 0 20px 60px rgba(0,0,0,.3);
+}
+#now-playing-card.playing::before{opacity:1}
+
+/* Album art / icon */
+.np-art-wrap{
+  width:88px;height:88px;margin:0 auto 1.2rem;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--s2),var(--s3));
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.4rem;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s;
+  position:relative;overflow:hidden;
+}
+#now-playing-card.playing .np-art-wrap{
+  transform:scale(1.08);
+  box-shadow:0 12px 40px var(--glow);
+  animation:artBreath 3s ease-in-out infinite;
+}
+@keyframes artBreath{0%,100%{box-shadow:0 12px 40px var(--glow)}50%{box-shadow:0 16px 60px rgba(124,107,255,.45)}}
+
+/* Spinning vinyl ring when playing */
+.np-art-wrap::after{
+  content:'';position:absolute;
+  width:140%;height:140%;
+  border-radius:50%;
+  border:2px solid rgba(124,107,255,.15);
+  border-top-color:rgba(124,107,255,.5);
+  opacity:0;
+  transition:opacity .4s;
+}
+#now-playing-card.playing .np-art-wrap::after{
+  opacity:1;
+  animation:spin 3s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#now-playing-text{
+  font-size:1.15rem;font-weight:700;
+  letter-spacing:-.02em;line-height:1.3;
+  margin-bottom:.3rem;
+  transition:color .3s;
+}
+#now-playing-card.playing #now-playing-text{color:var(--accent2)}
+
+#host-name{
+  font-size:.75rem;color:var(--muted);
+  font-family:'Space Mono',monospace;
+}
+
+/* Waveform */
+.waveform{
+  display:none;align-items:flex-end;justify-content:center;
+  gap:3px;height:22px;margin-top:1rem;
+}
+.waveform.active{display:flex}
+
+.wbar{
+  width:3px;border-radius:99px;
+  background:linear-gradient(to top,var(--accent),var(--green));
+  opacity:.85;
+}
+.wbar:nth-child(1){animation:wv 1.1s .00s ease-in-out infinite}
+.wbar:nth-child(2){animation:wv 1.1s .10s ease-in-out infinite}
+.wbar:nth-child(3){animation:wv 1.1s .20s ease-in-out infinite}
+.wbar:nth-child(4){animation:wv 1.1s .30s ease-in-out infinite}
+.wbar:nth-child(5){animation:wv 1.1s .15s ease-in-out infinite}
+.wbar:nth-child(6){animation:wv 1.1s .05s ease-in-out infinite}
+.wbar:nth-child(7){animation:wv 1.1s .25s ease-in-out infinite}
+@keyframes wv{0%,100%{height:3px}50%{height:20px}}
+
+/* ─── CACHE CARD ─── */
+.cache-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:16px;padding:.9rem 1.1rem;
+  width:min(380px,100%);
+  animation:fadeUp .6s .3s ease both;
+}
+.cache-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.cache-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.cache-val{font-size:.75rem;font-weight:700;font-family:'Space Mono',monospace;color:var(--green)}
+
+.cache-track{height:4px;background:var(--s3);border-radius:99px;overflow:hidden}
+.cache-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;transition:width .6s ease}
+
+/* ─── QUEUE BADGE ─── */
+#queue-badge{
+  display:none;
+  background:rgba(124,107,255,.12);
+  border:1px solid rgba(124,107,255,.25);
+  border-radius:12px;padding:.5rem 1rem;
+  font-size:.78rem;color:var(--accent2);
+  width:min(380px,100%);text-align:center;
+  animation:fadeUp .3s ease both;
+}
+
+/* ─── ERROR ─── */
+#error-msg{
+  display:none;
+  background:rgba(255,79,106,.08);
+  border:1px solid rgba(255,79,106,.25);
+  border-radius:12px;padding:.6rem 1.2rem;
+  font-size:.78rem;color:var(--red);
+  width:min(380px,100%);text-align:center;
+}
+
+/* ─── FETCH INDICATOR ─── */
+#fetch-indicator{
+  display:none;
+  align-items:center;gap:8px;
+  font-size:.75rem;color:var(--muted);
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:99px;padding:.45rem .9rem;
+}
+#fetch-indicator.show{display:flex}
+.fi-spin{
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--border2);
+  border-top-color:var(--accent);
+  animation:spin .7s linear infinite;
+  flex-shrink:0;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="sys-header">
+  <div class="sys-logo">🎙️</div>
+  <div class="sys-title">Sistema de audio — Asesorías Virtuales UTPL</div>
+</div>
+
+<div class="status-pill">
+  <div id="status-dot"></div>
+  <span id="status-text">Conectando…</span>
+</div>
+
+<div id="fetch-indicator">
+  <div class="fi-spin"></div>
+  <span id="fetch-text">Cargando audio…</span>
+</div>
+
+<div id="now-playing-card">
+  <div class="np-art-wrap">🎵</div>
+  <div id="now-playing-text">En espera…</div>
+  <div id="host-name"></div>
+  <div class="waveform" id="waveform">
+    <div class="wbar"></div>
+    <div class="wbar"></div>
+    <div class="wbar"></div>
+    <div class="wbar"></div>
+    <div class="wbar"></div>
+    <div class="wbar"></div>
+    <div class="wbar"></div>
+  </div>
+</div>
+
+<div id="queue-badge"></div>
+<div id="error-msg"></div>
+
+<div class="cache-card">
+  <div class="cache-row">
+    <span class="cache-label">📦 Caché local</span>
+    <span class="cache-val" id="cache-count">0 audios</span>
+  </div>
+  <div class="cache-track">
+    <div class="cache-fill" id="cache-fill" style="width:0%"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, get, set }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const FC = {
+  apiKey: "AIzaSyA8RWuhsJUOADzHbNzNo-XaZGSh8xHquS4",
+  authDomain: "easy-sounds.firebaseapp.com",
+  databaseURL: "https://easy-sounds-default-rtdb.firebaseio.com",
+  projectId: "easy-sounds",
+  storageBucket: "easy-sounds.firebasestorage.app",
+  messagingSenderId: "533583560824",
+  appId: "1:533583560824:web:b60e937e0e934f1da6ad8d"
+};
+
+const app = initializeApp(FC);
+const db = getDatabase(app);
+
+// ── UI ─────────────────────────────────────────────────
+const dot          = document.getElementById('status-dot');
+const statusText   = document.getElementById('status-text');
+const npText       = document.getElementById('now-playing-text');
+const hostNameEl   = document.getElementById('host-name');
+const card         = document.getElementById('now-playing-card');
+const waveform     = document.getElementById('waveform');
+const errorMsg     = document.getElementById('error-msg');
+const queueBadge   = document.getElementById('queue-badge');
+const fetchInd     = document.getElementById('fetch-indicator');
+const fetchTxt     = document.getElementById('fetch-text');
+
+dot.classList.add('ok');
+statusText.textContent = 'Conectado y escuchando';
+
+// ── INDEXEDDB CACHE ────────────────────────────────────
+const CACHE_DB = 'utpl-audio-v2';
+const STORE    = 'audios';
+let cacheDB = null;
+
+async function openCache() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(CACHE_DB, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(STORE, { keyPath: 'key' });
+    req.onsuccess = e => { cacheDB = e.target.result; res(cacheDB); };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+function cacheKey(profileId, name) { return profileId + '::' + name; }
+
+async function cacheGet(profileId, name) {
+  if (!cacheDB) return null;
+  return new Promise(res => {
+    const tx = cacheDB.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).get(cacheKey(profileId, name));
+    req.onsuccess = () => res(req.result || null);
+    req.onerror = () => res(null);
+  });
+}
+
+async function cachePut(profileId, name, data, mime) {
+  if (!cacheDB) return;
+  return new Promise(res => {
+    const tx = cacheDB.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put({ key: cacheKey(profileId, name), data, mime, ts: Date.now() });
+    tx.oncomplete = res; tx.onerror = res;
+  });
+}
+
+async function cacheCount() {
+  if (!cacheDB) return 0;
+  return new Promise(res => {
+    const tx = cacheDB.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).count();
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => res(0);
+  });
+}
+
+async function updateCacheUI() {
+  const count = await cacheCount();
+  document.getElementById('cache-count').textContent = count + ' audio' + (count !== 1 ? 's' : '');
+  document.getElementById('cache-fill').style.width = Math.min(count * 8, 100) + '%';
+}
+
+openCache().then(updateCacheUI);
+
+// ── HELPERS ────────────────────────────────────────────
+function encodeKey(name) { return name.replace(/[.#$[\]/]/g, '_'); }
+
+function showError(msg) {
+  errorMsg.style.display = 'block';
+  errorMsg.textContent = '⚠️ ' + msg;
+  setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
+}
+
+function setPlaying(name, host, isPlaying) {
+  npText.textContent = isPlaying ? name : 'En espera…';
+  hostNameEl.textContent = isPlaying && host ? 'Anfitrión/a: ' + host : '';
+  card.classList.toggle('playing', isPlaying);
+  waveform.classList.toggle('active', isPlaying);
+  // Update art
+  const art = card.querySelector('.np-art-wrap');
+  art.textContent = isPlaying ? '🎵' : '🎵';
+}
+
+function showFetch(show, text = 'Cargando audio…') {
+  fetchTxt.textContent = text;
+  fetchInd.classList.toggle('show', show);
+}
+
+// ── AUDIO STATE ────────────────────────────────────────
+let currentAudio = null;
+let loopTimer    = null;
+let lastCmdId    = null;
+let queuedCmd    = null;
+
+function stopAll(updateFB = true) {
+  if (currentAudio) {
+    currentAudio.onended = null;
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
+  if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+  queuedCmd = null;
+  setPlaying('', '', false);
+  queueBadge.style.display = 'none';
+  if (updateFB) {
+    set(ref(db, 'state/playing'), false);
+    set(ref(db, 'state/currentHost'), null);
+  }
+}
+
+// ── FETCH AUDIO (cache → Firebase) ────────────────────
+async function getAudioSrc(profileId, name, mime) {
+  // 1. Try IndexedDB
+  const cached = await cacheGet(profileId, name);
+  if (cached) {
+    console.log('[cache HIT]', name);
+    return 'data:' + cached.mime + ';base64,' + cached.data;
+  }
+
+  // 2. Fetch from Firebase
+  console.log('[cache MISS] fetching from Firebase…', name);
+  showFetch(true, 'Descargando "' + name + '"…');
+  try {
+    const snap = await get(ref(db, `audio/${profileId}/${encodeKey(name)}`));
+    const entry = snap.val();
+    if (!entry || !entry.data) {
+      showFetch(false);
+      return null;
+    }
+    await cachePut(profileId, name, entry.data, entry.mime || mime || 'audio/mpeg');
+    await updateCacheUI();
+    showFetch(false);
+    console.log('[cached locally]', name);
+    return 'data:' + (entry.mime || mime || 'audio/mpeg') + ';base64,' + entry.data;
+  } catch(e) {
+    showFetch(false);
+    console.error('Firebase fetch failed', e);
+    return null;
+  }
+}
+
+// Pre-fetch audio in background (called for queue items)
+async function prefetch(profileId, name, mime) {
+  const cached = await cacheGet(profileId, name);
+  if (!cached) { await getAudioSrc(profileId, name, mime); }
+}
+
+// ── PLAY AUDIO ─────────────────────────────────────────
+async function playAudio(profileId, name, mime, host, onEnd) {
+  const src = await getAudioSrc(profileId, name, mime);
+  if (!src) {
+    showError('No se pudo cargar el audio: ' + name);
+    setPlaying('', '', false);
+    if (onEnd) onEnd();
+    return;
+  }
+
+  if (currentAudio) { currentAudio.onended = null; currentAudio.pause(); }
+
+  const audio = new Audio(src);
+  currentAudio = audio;
+  const displayName = name.replace(/\.[^.]+$/, '');
+  setPlaying(displayName, host, true);
+
+  audio.play().catch(e => {
+    showError('Error al reproducir: ' + e.message);
+    setPlaying('', '', false);
+    if (onEnd) onEnd();
+  });
+
+  audio.onended = () => {
+    if (currentAudio !== audio) return;
+    setPlaying('', '', false);
+    if (onEnd) onEnd();
+  };
+  audio.onerror = () => {
+    showError('Error en el audio: ' + name);
+    if (onEnd) onEnd();
+  };
+}
+
+// ── CMD LISTENER ───────────────────────────────────────
+onValue(ref(db, 'cmd'), async (snap) => {
+  const d = snap.val();
+  if (!d || d.id === lastCmdId) return;
+  lastCmdId = d.id;
+
+  const { action, host, name, mime, interval, profileId } = d;
+
+  if (action === 'play') {
+    if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+    queueBadge.style.display = 'none';
+    set(ref(db, 'state/playing'), true);
+    set(ref(db, 'state/currentHost'), host || null);
+
+    await playAudio(profileId, name, mime, host, () => {
+      set(ref(db, 'state/playing'), false);
+      set(ref(db, 'state/currentHost'), null);
+
+      if (queuedCmd) {
+        const q = queuedCmd; queuedCmd = null;
+        queueBadge.style.display = 'none';
+        set(ref(db, 'state/playing'), true);
+        playAudio(q.profileId, q.name, q.mime, q.host, () => {
+          set(ref(db, 'state/playing'), false);
+          set(ref(db, 'state/currentHost'), null);
+        });
+      }
+    });
+
+  } else if (action === 'queue') {
+    if (!currentAudio || currentAudio.ended) {
+      set(ref(db, 'state/playing'), true);
+      set(ref(db, 'state/currentHost'), host || null);
+      await playAudio(profileId, name, mime, host, () => {
+        set(ref(db, 'state/playing'), false);
+        set(ref(db, 'state/currentHost'), null);
+      });
+    } else {
+      queuedCmd = { profileId, name, mime, host };
+      queueBadge.style.display = 'block';
+      queueBadge.textContent = '⏭ En cola: ' + name.replace(/\.[^.]+$/, '');
+      prefetch(profileId, name, mime); // pre-cache in background
+    }
+
+  } else if (action === 'loop') {
+    if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+    const ms = (interval || 120) * 1000;
+
+    const doLoop = async () => {
+      if (loopTimer === null) return;
+      set(ref(db, 'state/playing'), true);
+      await playAudio(profileId, '🔁 ' + name, mime, host, () => {
+        set(ref(db, 'state/playing'), false);
+        loopTimer = setTimeout(doLoop, ms);
+      });
+    };
+
+    // Fix: loop timing starts from when audio STARTS, not ends
+    loopTimer = true;
+    doLoop();
+
+  } else if (action === 'pause') {
+    if (currentAudio) {
+      currentAudio.pause();
+      const cleanName = npText.textContent;
+      setPlaying(cleanName, '', false);
+      npText.textContent = '⏸ ' + cleanName;
+      set(ref(db, 'state/playing'), false);
+    }
+
+  } else if (action === 'resume') {
+    if (currentAudio) {
+      currentAudio.play().catch(e => showError('Error al reanudar: ' + e.message));
+      set(ref(db, 'state/playing'), true);
+      waveform.classList.add('active');
+      card.classList.add('playing');
+    }
+
+  } else if (action === 'stop') {
+    stopAll(true);
+  }
+});
+
+// ── CLEANUP stale paused state on load ─────────────────
+onValue(ref(db, 'state'), snap => {
+  const s = snap.val() || {};
+  // If player reloads while paused, clear the stale state
+  if (s.paused && !currentAudio) {
+    set(ref(db, 'state/paused'), false);
+    set(ref(db, 'state/playing'), false);
+  }
+}, { onlyOnce: true });
+</script>
+</body>
+</html>
