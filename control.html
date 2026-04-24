@@ -642,7 +642,7 @@ body::before{
     Toca para subir audios
     <div class="dz-hint">.mp3 · .wav · .ogg · .m4a — máx 10 MB total</div>
   </div>
-  <input type="file" id="file-input" accept="audio/*" multiple>
+  <input type="file" id="file-input" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,.opus" multiple>
   <div id="audio-list"></div>
 </div>
 
@@ -819,13 +819,14 @@ window.deleteProfile = async (e, id) => {
   const p = profiles.find(x => x.id === id);
   if (!p) return;
   if (!confirm(`¿Eliminar el perfil "${p.name}" y todos sus audios?`)) return;
-  // Remove from Firebase audio store
-  try { await remove(ref(db, `audio/${id}`)); } catch(e) {}
+  try { await remove(ref(db, `audio/${id}`)); } catch(err) {}
   profiles = profiles.filter(x => x.id !== id);
   if (localStorage.getItem('utpl_last_profile') === id) localStorage.removeItem('utpl_last_profile');
   await saveProfiles();
   renderProfiles();
 };
+
+function selectProfile(id) {
   const p = profiles.find(x => x.id === id);
   if (!p) return;
   currentProfile = p;
@@ -1125,8 +1126,17 @@ dropZone.addEventListener('drop', e => {
 });
 
 async function handleFiles(files) {
+  const AUDIO_EXTS = /\.(mp3|wav|ogg|m4a|aac|flac|opus|webm|wma)$/i;
   for (const file of Array.from(files)) {
-    if (!file.type.startsWith('audio/')) continue;
+    // Accept by MIME type OR by extension (iOS/Android sometimes sends empty/wrong MIME)
+    const validMime = file.type.startsWith('audio/');
+    const validExt  = AUDIO_EXTS.test(file.name);
+    if (!validMime && !validExt) continue;
+    // Ensure we have a sane mime type even if browser didn't set one
+    const EXT_MIME = {mp3:'audio/mpeg',mp4:'audio/mp4',m4a:'audio/mp4',aac:'audio/aac',
+                      ogg:'audio/ogg',wav:'audio/wav',flac:'audio/flac',opus:'audio/opus',webm:'audio/webm'};
+    const ext = file.name.split('.').pop().toLowerCase();
+    const resolvedMime = (file.type && file.type.startsWith('audio/')) ? file.type : (EXT_MIME[ext] || 'audio/mpeg');
 
     const totalBytes = audios.reduce((s, a) => s + (a.size || 0), 0);
     if (totalBytes + file.size > PER_PROFILE_LIMIT_MB * 1048576) {
@@ -1135,7 +1145,7 @@ async function handleFiles(files) {
     }
 
     // Add placeholder
-    const placeholder = { name: file.name, mime: file.type, size: file.size, loopInterval: 120, cached: false, uploading: true };
+    const placeholder = { name: file.name, mime: resolvedMime, size: file.size, loopInterval: 120, cached: false, uploading: true };
     audios.push(placeholder);
     saveCurrentProfile();
     renderList();
@@ -1143,7 +1153,7 @@ async function handleFiles(files) {
 
     // Try compression
     let finalBlob = null;
-    let finalMime = file.type;
+    let finalMime = resolvedMime;
     try {
       const compressed = await compressAudio(file);
       if (compressed && compressed.size < file.size * 0.85) {
