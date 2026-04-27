@@ -173,11 +173,11 @@ body::before{
 }
 .qr-inline:hover{border-color:var(--accent2);background:var(--s2)}
 .qr-inline-canvas{
-  width:52px;height:52px;border-radius:8px;
-  background:#fff;padding:3px;flex-shrink:0;
+  width:76px;height:76px;border-radius:10px;
+  background:#fff;padding:4px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
 }
-.qr-inline-canvas canvas,.qr-inline-canvas img{width:46px!important;height:46px!important}
+.qr-inline-canvas canvas,.qr-inline-canvas img{width:68px!important;height:68px!important}
 .qr-label{font-size:.68rem;color:var(--muted);line-height:1.4;max-width:90px}
 .qr-label strong{display:block;color:var(--text2);font-size:.75rem;font-weight:600;margin-bottom:2px}
 
@@ -483,7 +483,41 @@ body::before{
 .a-edit-hint{font-size:.6rem;color:var(--muted2);flex-shrink:0;opacity:0;transition:opacity .15s;white-space:nowrap}
 .a-label-row:hover .a-edit-hint,.a-label-edit:focus~.a-edit-hint{opacity:1}
 
-/* Stop button per card (shown only when playing) */
+/* Copy welcome btn */
+.a-copy-btn{
+  padding:.7rem 1rem;border-radius:13px;border:1px solid var(--border2);
+  background:var(--s2);color:var(--muted);font-size:.88rem;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;white-space:nowrap;
+}
+.a-copy-btn:hover{border-color:var(--green);color:var(--green);background:rgba(0,210,168,.06)}
+
+/* Welcome hero card — versión compacta tipo storage bar */
+.welcome-hero{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:.7rem .9rem;
+  margin-bottom:.75rem;
+  position:relative;overflow:hidden;
+}
+.wh-row{display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+.wh-left{display:flex;align-items:center;gap:.55rem;min-width:0}
+.wh-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.wh-copy-btn{
+  display:flex;align-items:center;gap:.4rem;flex-shrink:0;
+  padding:.35rem .75rem;border-radius:8px;
+  border:1px solid var(--border2);background:var(--s2);
+  color:var(--text2);font-size:.72rem;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .18s;
+  white-space:nowrap;
+}
+.wh-copy-btn:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(108,92,231,.08)}
+.wh-copy-btn.copied{border-color:rgba(0,210,168,.4);color:var(--green);background:var(--green-dim)}
+.wh-preview-panel{
+  display:none;margin-top:.6rem;
+  background:rgba(0,0,0,.3);border:1px solid var(--border2);
+  border-radius:8px;padding:.65rem .8rem;
+  font-size:.75rem;color:var(--text2);line-height:1.55;white-space:pre-wrap;
+}
+.wh-preview-panel.show{display:block}
 .a-stop-btn{
   padding:.7rem .95rem;border-radius:13px;
   border:1px solid rgba(255,71,87,.3);
@@ -739,6 +773,30 @@ body::before{
 
   <div class="section-title">tus audios</div>
 
+  <!-- Mensaje bienvenida — card compacta -->
+  <div style="
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    background:var(--s1);border:1px solid var(--border2);
+    border-radius:12px;padding:.75rem 1rem;margin-bottom:.9rem;
+  ">
+    <div style="display:flex;align-items:center;gap:.6rem;min-width:0">
+      <span style="font-size:1.3rem;flex-shrink:0">📋</span>
+      <div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--text);line-height:1.2">Mensaje de bienvenida</div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:2px">Copia el mensaje del formulario para tus clientes</div>
+      </div>
+    </div>
+    <button id="wh-copy-btn" onclick="copyWelcomeMsgHero()" style="
+      flex-shrink:0;display:flex;align-items:center;gap:6px;
+      padding:.5rem .9rem;border-radius:9px;
+      border:1px solid var(--border2);
+      background:var(--s2);color:var(--text2);
+      font-size:.78rem;font-weight:700;
+      cursor:pointer;font-family:'Outfit',sans-serif;transition:all .18s;
+      white-space:nowrap;
+    ">📋 Copiar</button>
+  </div>
+
   <div id="audio-list"></div>
 
   <!-- Compress status (con cierre) -->
@@ -843,7 +901,7 @@ function renderQR() {
     document.getElementById('qr-canvas').innerHTML = '';
     new QRCode(document.getElementById('qr-canvas'), {
       text: controlURL,
-      width: 46, height: 46,
+      width: 68, height: 68,
       colorDark: '#07070f',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M
@@ -1307,6 +1365,7 @@ function renderList() {
             <button class="a-play-btn" data-play="${i}" ${playDisabled ? 'disabled' : ''}
               title="${isGloballyPlaying ? 'Hay un audio reproduciéndose — detén primero' : ''}">▶ Reproducir</button>
             <button class="a-queue-btn" data-queue="${i}" title="Agregar a cola" ${queueDisabled ? 'disabled' : ''}>+ Cola</button>
+            ${i === 0 ? `` : ''}
             <div style="position:relative">
               <button class="a-more-btn" data-more="${i}" title="Más opciones">⋯</button>
               <div class="a-dropdown" id="dd-${i}">
@@ -1357,8 +1416,16 @@ function renderList() {
       if (e.key === 'Escape') { labelInput.value = displayLabel; labelInput.blur(); }
     });
 
-    item.querySelector('[data-play]')?.addEventListener('click', () => playNow(i));
+    item.querySelector('[data-play]')?.addEventListener('click', () => {
+      if (i === 0) {
+        playNow(i);
+        window.copyWelcomeMsgHero();
+      } else {
+        playNow(i);
+      }
+    });
     item.querySelector('[data-queue]')?.addEventListener('click', () => addQueue(i));
+    item.querySelector('[data-copywelcome]')?.addEventListener('click', (e) => copyWelcomeMsg(e.currentTarget));
     item.querySelector('[data-stop]')?.addEventListener('click', () => sendCmd('stop'));
     item.querySelector('[data-more]')?.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1382,7 +1449,69 @@ function renderList() {
   });
 }
 
-function playNow(i) { activeLoopName = null; sendCmd('play', audios[i]); }
+const CLIPBOARD_MSG = `¡Queremos ofrecerte la mejor atención virtual posible! Ayúdanos proporcionando tus datos aquí https://forms.office.com/r/q4pCSrHhGB , los cuales son esenciales para brindar un seguimiento personalizado a tus requerimientos. Tu comodidad y satisfacción son nuestra prioridad!
+Se les informa que las asesorías podrán ser grabadas para verificar la calidad de la atención y el cumplimiento de normas éticas institucionales de los participantes.`;
+
+function copyWelcomeMsg(btnEl) {
+  navigator.clipboard.writeText(CLIPBOARD_MSG).then(() => {
+    if (!btnEl) return;
+    const orig = btnEl.textContent;
+    btnEl.textContent = '✓ Copiado';
+    btnEl.style.borderColor = 'var(--green)';
+    btnEl.style.color = 'var(--green)';
+    setTimeout(() => {
+      btnEl.textContent = orig;
+      btnEl.style.borderColor = '';
+      btnEl.style.color = '';
+    }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = CLIPBOARD_MSG;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+
+window.copyWelcomeMsgHero = function() {
+  const btn = document.getElementById('wh-copy-btn');
+  navigator.clipboard.writeText(CLIPBOARD_MSG).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = CLIPBOARD_MSG; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+  if (btn) {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copiado';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'rgba(0,210,168,.35)';
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2500);
+  }
+};
+
+window.toggleWelcomePreview = function(previewBtn) {
+  const panel = document.getElementById('wh-preview');
+  const isOpen = panel.classList.contains('show');
+  if (!isOpen) {
+    panel.textContent = CLIPBOARD_MSG;
+    panel.classList.add('show');
+    previewBtn.innerHTML = '<span>▲</span>';
+  } else {
+    panel.classList.remove('show');
+    previewBtn.innerHTML = '<span>👁</span>';
+  }
+};
+
+function playNow(i) {
+  activeLoopName = null;
+  sendCmd('play', audios[i]);
+}
 function addQueue(i) { sendCmd('queue', audios[i]); }
 
 function toggleLoopConfig(i) {
