@@ -3,32 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Player — Asesorías UTPL</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>Player — Asesorías Virtuales</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%236c5ce7'/><stop offset='100%25' stop-color='%2300d2a8'/></linearGradient></defs><rect width='64' height='64' rx='16' fill='url(%23g)'/><text x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-size='36'>🎙️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #080810;
-  --s1: #0f0f1a;
-  --s2: #161625;
-  --s3: #1e1e30;
-  --border: #ffffff0f;
-  --border2: #ffffff18;
-  --accent: #7c6bff;
-  --accent2: #a78bfa;
-  --glow: rgba(124,107,255,.25);
-  --green: #10d4a0;
-  --green-glow: rgba(16,212,160,.3);
-  --red: #ff4f6a;
-  --muted: #6a6a88;
-  --muted2: #4a4a66;
-  --text: #f0f0f8;
+  --bg: #07070f;
+  --s1: #0e0e1c;
+  --s2: #141426;
+  --s3: #1a1a30;
+  --border: #ffffff0a;
+  --border2: #ffffff14;
+  --border3: #ffffff22;
+  --accent: #6c5ce7;
+  --accent2: #a29bfe;
+  --glow: rgba(108,92,231,.22);
+  --green: #00d2a8;
+  --green-glow: rgba(0,210,168,.25);
+  --red: #ff4757;
+  --yellow: #ffa502;
+  --muted: #606088;
+  --muted2: #3c3c58;
+  --text: #eeeef8;
+  --text2: #b0b0cc;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-tap-highlight-color:transparent}
 
 body{
-  font-family:'DM Sans',sans-serif;
+  font-family:'Outfit',sans-serif;
   background:var(--bg);
   color:var(--text);
   min-height:100vh;
@@ -37,142 +41,162 @@ body{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:1.2rem;
-  padding:2rem 1.5rem;
+  gap:1rem;
+  padding:1.5rem 1.2rem env(safe-area-inset-bottom,0px);
   overflow-x:hidden;
 }
 
-/* Background */
 body::before{
   content:'';position:fixed;inset:0;
   background:
-    radial-gradient(ellipse 70% 50% at 15% 20%, rgba(124,107,255,.1) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 60% at 85% 80%, rgba(16,212,160,.07) 0%, transparent 65%);
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(108,92,231,.09) 0%,transparent 65%),
+    radial-gradient(ellipse 70% 70% at 90% 90%, rgba(0,210,168,.06) 0%,transparent 65%);
   pointer-events:none;z-index:0;
 }
-
-/* All children above bg */
 body > *{position:relative;z-index:1}
 
-/* ─── HEADER ─── */
-.sys-header{
-  text-align:center;
-  animation:fadeUp .6s ease both;
+/* ─── UNLOCK OVERLAY ─── */
+#unlock-overlay{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.5rem;padding:2rem;
+  transition:opacity .4s ease, visibility .4s ease;
 }
-.sys-logo{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:52px;height:52px;border-radius:16px;
-  background:linear-gradient(135deg,var(--accent),var(--green));
-  font-size:1.6rem;margin-bottom:.6rem;
-  box-shadow:0 8px 30px var(--glow);
-}
-.sys-title{font-size:.82rem;color:var(--muted);font-weight:400;letter-spacing:.02em}
+#unlock-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
 
-/* ─── STATUS PILL ─── */
-.status-pill{
+.unlock-icon{
+  width:80px;height:80px;border-radius:24px;
+  background:linear-gradient(135deg,var(--accent),var(--green));
+  display:flex;align-items:center;justify-content:center;font-size:2.2rem;
+  box-shadow:0 16px 50px var(--glow);
+  animation:breathe 2s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{box-shadow:0 16px 50px var(--glow)}50%{box-shadow:0 16px 70px rgba(108,92,231,.5)}}
+
+.unlock-title{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;text-align:center}
+.unlock-sub{font-size:.85rem;color:var(--muted);text-align:center;max-width:260px;line-height:1.6}
+
+.unlock-btn{
+  padding:.95rem 2.8rem;
+  background:linear-gradient(135deg,var(--accent),#4834d4);
+  color:#fff;border:none;border-radius:16px;
+  font-size:1.05rem;font-weight:700;cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  box-shadow:0 8px 28px var(--glow);
+  transition:transform .15s, box-shadow .15s;
+  animation:btnpulse 2s ease-in-out infinite;
+}
+.unlock-btn:hover{transform:translateY(-2px);box-shadow:0 12px 36px var(--glow)}
+@keyframes btnpulse{0%,100%{box-shadow:0 8px 28px var(--glow)}50%{box-shadow:0 8px 44px rgba(108,92,231,.6)}}
+
+/* ─── TOP BAR ─── */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  width:min(400px,100%);gap:.75rem;
+}
+
+.brand-pill{
   display:flex;align-items:center;gap:8px;
   background:var(--s1);border:1px solid var(--border2);
-  border-radius:99px;padding:.5rem 1rem;
-  font-size:.8rem;color:var(--muted);
-  animation:fadeUp .6s .1s ease both;
+  border-radius:99px;padding:.4rem .75rem;
+}
+.brand-icon-sm{
+  width:26px;height:26px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--green));
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;
+}
+.brand-text-sm{font-size:.75rem;font-weight:600;color:var(--text2)}
+
+.status-pill{
+  display:flex;align-items:center;gap:7px;
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:99px;padding:.4rem .85rem;
+  font-size:.75rem;color:var(--muted);
   transition:all .3s;
 }
-
 #status-dot{
-  width:9px;height:9px;border-radius:50%;
-  background:var(--red);flex-shrink:0;
-  transition:background .3s;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);flex-shrink:0;transition:background .3s;
 }
 #status-dot.ok{
   background:var(--green);
   box-shadow:0 0 10px var(--green);
-  animation:pulse 2s ease infinite;
+  animation:statusPulse 2s ease infinite;
 }
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ─── NOW PLAYING CARD ─── */
-#now-playing-card{
-  background:var(--s1);
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:2rem 2rem 1.8rem;
-  text-align:center;
-  width:min(380px,100%);
+/* ─── MAIN PLAYER CARD ─── */
+#player-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:28px;padding:2.2rem 1.8rem 2rem;
+  text-align:center;width:min(400px,100%);
   position:relative;overflow:hidden;
-  animation:fadeUp .6s .2s ease both;
+  animation:fadeUp .6s .15s ease both;
   transition:border-color .4s, box-shadow .4s;
 }
-
-/* Top gradient line */
-#now-playing-card::before{
+#player-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,var(--accent),var(--green));
   opacity:0;transition:opacity .5s;
 }
-#now-playing-card.playing{
-  border-color:rgba(124,107,255,.25);
-  box-shadow:0 0 60px rgba(124,107,255,.1), 0 20px 60px rgba(0,0,0,.3);
+#player-card.playing{
+  border-color:rgba(108,92,231,.2);
+  box-shadow:0 0 60px rgba(108,92,231,.08), 0 24px 60px rgba(0,0,0,.3);
 }
-#now-playing-card.playing::before{opacity:1}
+#player-card.playing::before{opacity:1}
 
-/* Album art / icon */
-.np-art-wrap{
-  width:88px;height:88px;margin:0 auto 1.2rem;
-  border-radius:22px;
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* Art / icon */
+.art-wrap{
+  width:100px;height:100px;margin:0 auto 1.4rem;
+  border-radius:26px;
   background:linear-gradient(135deg,var(--s2),var(--s3));
   border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:2.4rem;
+  display:flex;align-items:center;justify-content:center;font-size:2.8rem;
   transition:transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .4s;
   position:relative;overflow:hidden;
 }
-#now-playing-card.playing .np-art-wrap{
-  transform:scale(1.08);
-  box-shadow:0 12px 40px var(--glow);
-  animation:artBreath 3s ease-in-out infinite;
+#player-card.playing .art-wrap{
+  transform:scale(1.06);
+  box-shadow:0 14px 44px var(--glow);
+  animation:artBreathe 3.5s ease-in-out infinite;
 }
-@keyframes artBreath{0%,100%{box-shadow:0 12px 40px var(--glow)}50%{box-shadow:0 16px 60px rgba(124,107,255,.45)}}
+@keyframes artBreathe{0%,100%{box-shadow:0 14px 44px var(--glow)}50%{box-shadow:0 18px 60px rgba(108,92,231,.5)}}
 
-/* Spinning vinyl ring when playing */
-.np-art-wrap::after{
+/* Spinning ring */
+.art-wrap::after{
   content:'';position:absolute;
-  width:140%;height:140%;
-  border-radius:50%;
-  border:2px solid rgba(124,107,255,.15);
-  border-top-color:rgba(124,107,255,.5);
-  opacity:0;
-  transition:opacity .4s;
+  width:150%;height:150%;border-radius:50%;
+  border:2px solid rgba(108,92,231,.12);
+  border-top-color:rgba(108,92,231,.45);
+  opacity:0;transition:opacity .4s;
 }
-#now-playing-card.playing .np-art-wrap::after{
-  opacity:1;
-  animation:spin 3s linear infinite;
-}
+#player-card.playing .art-wrap::after{opacity:1;animation:spin 3s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#now-playing-text{
-  font-size:1.15rem;font-weight:700;
-  letter-spacing:-.02em;line-height:1.3;
-  margin-bottom:.3rem;
+.now-title{
+  font-size:1.25rem;font-weight:800;letter-spacing:-.025em;
+  line-height:1.3;margin-bottom:.3rem;
   transition:color .3s;
 }
-#now-playing-card.playing #now-playing-text{color:var(--accent2)}
+#player-card.playing .now-title{color:var(--accent2)}
 
-#host-name{
-  font-size:.75rem;color:var(--muted);
-  font-family:'Space Mono',monospace;
+.now-host{
+  font-size:.73rem;color:var(--muted);font-family:'JetBrains Mono',monospace;
+  margin-bottom:1rem;min-height:1.1rem;
 }
 
 /* Waveform */
 .waveform{
   display:none;align-items:flex-end;justify-content:center;
-  gap:3px;height:22px;margin-top:1rem;
+  gap:3px;height:24px;margin-bottom:1.2rem;
 }
 .waveform.active{display:flex}
-
 .wbar{
   width:3px;border-radius:99px;
-  background:linear-gradient(to top,var(--accent),var(--green));
-  opacity:.85;
+  background:linear-gradient(to top,var(--accent),var(--green));opacity:.85;
 }
 .wbar:nth-child(1){animation:wv 1.1s .00s ease-in-out infinite}
 .wbar:nth-child(2){animation:wv 1.1s .10s ease-in-out infinite}
@@ -181,101 +205,149 @@ body > *{position:relative;z-index:1}
 .wbar:nth-child(5){animation:wv 1.1s .15s ease-in-out infinite}
 .wbar:nth-child(6){animation:wv 1.1s .05s ease-in-out infinite}
 .wbar:nth-child(7){animation:wv 1.1s .25s ease-in-out infinite}
-@keyframes wv{0%,100%{height:3px}50%{height:20px}}
+@keyframes wv{0%,100%{height:3px}50%{height:22px}}
 
-/* ─── CACHE CARD ─── */
-.cache-card{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:16px;padding:.9rem 1.1rem;
-  width:min(380px,100%);
-  animation:fadeUp .6s .3s ease both;
+/* ─── BIG STOP BUTTON (when playing) ─── */
+.stop-zone{
+  display:none;
+  width:100%;padding:.9rem;
+  background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.2);
+  border-radius:14px;color:var(--red);
+  font-size:1rem;font-weight:700;cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .15s;
+  align-items:center;justify-content:center;gap:.5rem;
+  margin-top:.4rem;
 }
-.cache-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
-.cache-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
-.cache-val{font-size:.75rem;font-weight:700;font-family:'Space Mono',monospace;color:var(--green)}
+.stop-zone:hover{background:rgba(255,71,87,.15)}
+#player-card.playing .stop-zone{display:flex}
 
-.cache-track{height:4px;background:var(--s3);border-radius:99px;overflow:hidden}
-.cache-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;transition:width .6s ease}
+/* ─── IDLE STATE ─── */
+.idle-hint{
+  font-size:.82rem;color:var(--muted);
+  line-height:1.5;margin-top:.4rem;
+}
+#player-card:not(.playing) .idle-hint{display:block}
+#player-card.playing .idle-hint{display:none}
 
 /* ─── QUEUE BADGE ─── */
 #queue-badge{
   display:none;
-  background:rgba(124,107,255,.12);
-  border:1px solid rgba(124,107,255,.25);
+  background:rgba(108,92,231,.08);border:1px solid rgba(108,92,231,.18);
   border-radius:12px;padding:.5rem 1rem;
-  font-size:.78rem;color:var(--accent2);
-  width:min(380px,100%);text-align:center;
+  font-size:.75rem;color:var(--accent2);
+  width:min(400px,100%);text-align:center;
   animation:fadeUp .3s ease both;
+}
+
+/* ─── FETCH INDICATOR ─── */
+#fetch-indicator{
+  display:none;align-items:center;gap:8px;
+  font-size:.72rem;color:var(--muted);
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:99px;padding:.4rem .85rem;
+}
+#fetch-indicator.show{display:flex}
+.fi-spin{
+  width:11px;height:11px;border-radius:50%;
+  border:2px solid var(--border2);border-top-color:var(--accent);
+  animation:spin .7s linear infinite;flex-shrink:0;
 }
 
 /* ─── ERROR ─── */
 #error-msg{
   display:none;
-  background:rgba(255,79,106,.08);
-  border:1px solid rgba(255,79,106,.25);
-  border-radius:12px;padding:.6rem 1.2rem;
-  font-size:.78rem;color:var(--red);
-  width:min(380px,100%);text-align:center;
+  background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.2);
+  border-radius:12px;padding:.55rem 1rem;
+  font-size:.75rem;color:var(--red);
+  width:min(400px,100%);text-align:center;
 }
 
-/* ─── FETCH INDICATOR ─── */
-#fetch-indicator{
+/* ─── CACHE SECTION (hidden by default, toggle button) ─── */
+#cache-toggle-btn{
+  display:flex;align-items:center;gap:6px;
+  background:transparent;border:none;cursor:pointer;
+  font-size:.65rem;color:var(--muted2);font-family:'JetBrains Mono',monospace;
+  padding:.3rem .5rem;border-radius:6px;transition:color .15s;
+  align-self:flex-start;
+}
+#cache-toggle-btn:hover{color:var(--muted)}
+
+#cache-panel{
   display:none;
-  align-items:center;gap:8px;
-  font-size:.75rem;color:var(--muted);
-  background:var(--s1);border:1px solid var(--border2);
-  border-radius:99px;padding:.45rem .9rem;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:12px;padding:.75rem 1rem;
+  width:min(400px,100%);
+  animation:fadeUp .2s ease;
 }
-#fetch-indicator.show{display:flex}
-.fi-spin{
-  width:12px;height:12px;border-radius:50%;
-  border:2px solid var(--border2);
-  border-top-color:var(--accent);
-  animation:spin .7s linear infinite;
-  flex-shrink:0;
-}
+#cache-panel.show{display:block}
+.cache-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem}
+.cache-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.cache-val{font-size:.72rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--green)}
+.cache-track{height:3px;background:var(--s3);border-radius:99px;overflow:hidden}
+.cache-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;transition:width .6s ease}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
 </style>
 </head>
 <body>
 
-<div class="sys-header">
-  <div class="sys-logo">🎙️</div>
-  <div class="sys-title">Sistema de audio — Asesorías Virtuales UTPL</div>
+<!-- ─── UNLOCK OVERLAY ─── -->
+<div id="unlock-overlay">
+  <div class="unlock-icon">🎙️</div>
+  <div class="unlock-title">Sistema de Audio</div>
+  <div class="unlock-sub" id="unlock-sub">Toca el botón para activar el audio en este dispositivo</div>
+  <button class="unlock-btn" id="unlock-btn">🔊 Activar audio</button>
 </div>
 
-<div class="status-pill">
-  <div id="status-dot"></div>
-  <span id="status-text">Conectando…</span>
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="brand-pill">
+    <div class="brand-icon-sm">🎙️</div>
+    <span class="brand-text-sm">Asesorías Virtuales</span>
+  </div>
+  <div class="status-pill">
+    <div id="status-dot"></div>
+    <span id="status-text">Conectando…</span>
+  </div>
 </div>
 
+<!-- Fetch indicator -->
 <div id="fetch-indicator">
   <div class="fi-spin"></div>
   <span id="fetch-text">Cargando audio…</span>
 </div>
 
-<div id="now-playing-card">
-  <div class="np-art-wrap">🎵</div>
-  <div id="now-playing-text">En espera…</div>
-  <div id="host-name"></div>
+<!-- Main player card -->
+<div id="player-card">
+  <div class="art-wrap" id="art-icon">🎵</div>
+  <div class="now-title" id="now-playing-text">En espera…</div>
+  <div class="now-host" id="host-name"></div>
   <div class="waveform" id="waveform">
-    <div class="wbar"></div>
-    <div class="wbar"></div>
-    <div class="wbar"></div>
-    <div class="wbar"></div>
-    <div class="wbar"></div>
-    <div class="wbar"></div>
+    <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
+    <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
     <div class="wbar"></div>
   </div>
+  <div class="idle-hint">Esperando instrucciones del anfitrión…</div>
+  <button class="stop-zone" id="stop-btn-card">■ Detener reproducción</button>
 </div>
 
+<!-- Queue badge -->
 <div id="queue-badge"></div>
+
+<!-- Error -->
 <div id="error-msg"></div>
 
-<div class="cache-card">
+<!-- Cache toggle (discreto) -->
+<button id="cache-toggle-btn" onclick="document.getElementById('cache-panel').classList.toggle('show');this.querySelector('.ct-arrow').textContent=document.getElementById('cache-panel').classList.contains('show')?'▲':'▼'">
+  <span>caché local</span>
+  <span class="ct-arrow">▼</span>
+</button>
+
+<div id="cache-panel">
   <div class="cache-row">
-    <span class="cache-label">📦 Caché local</span>
+    <span class="cache-label">📦 Almacenamiento local</span>
     <span class="cache-val" id="cache-count">0 audios</span>
   </div>
   <div class="cache-track">
@@ -284,9 +356,8 @@ body > *{position:relative;z-index:1}
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, get, set }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, get, set }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FC = {
   apiKey: "AIzaSyA8RWuhsJUOADzHbNzNo-XaZGSh8xHquS4",
@@ -299,34 +370,37 @@ const FC = {
 };
 
 const app = initializeApp(FC);
-const db = getDatabase(app);
+const db  = getDatabase(app);
 
-// ── UI ─────────────────────────────────────────────────
-const dot          = document.getElementById('status-dot');
-const statusText   = document.getElementById('status-text');
-const npText       = document.getElementById('now-playing-text');
-const hostNameEl   = document.getElementById('host-name');
-const card         = document.getElementById('now-playing-card');
-const waveform     = document.getElementById('waveform');
-const errorMsg     = document.getElementById('error-msg');
-const queueBadge   = document.getElementById('queue-badge');
-const fetchInd     = document.getElementById('fetch-indicator');
-const fetchTxt     = document.getElementById('fetch-text');
+// ── UI refs ────────────────────────────────────────────
+const dot        = document.getElementById('status-dot');
+const statusText = document.getElementById('status-text');
+const npText     = document.getElementById('now-playing-text');
+const hostNameEl = document.getElementById('host-name');
+const card       = document.getElementById('player-card');
+const waveform   = document.getElementById('waveform');
+const errorMsg   = document.getElementById('error-msg');
+const queueBadge = document.getElementById('queue-badge');
+const fetchInd   = document.getElementById('fetch-indicator');
+const fetchTxt   = document.getElementById('fetch-text');
+const stopCardBtn = document.getElementById('stop-btn-card');
 
-dot.classList.add('ok');
-statusText.textContent = 'Conectado y escuchando';
+// ── STOP button on card ────────────────────────────────
+stopCardBtn.addEventListener('click', () => stopAll(true));
 
 // ── INDEXEDDB CACHE ────────────────────────────────────
-const CACHE_DB = 'utpl-audio-v2';
-const STORE    = 'audios';
-let cacheDB = null;
+const CACHE_DB     = 'utpl-audio-v3';
+const STORE        = 'audios';
+const CACHE_MAX_MB = 50;
+const CACHE_MAX_B  = CACHE_MAX_MB * 1048576;
+let   cacheDB      = null;
 
 async function openCache() {
   return new Promise((res, rej) => {
     const req = indexedDB.open(CACHE_DB, 1);
     req.onupgradeneeded = e => e.target.result.createObjectStore(STORE, { keyPath: 'key' });
     req.onsuccess = e => { cacheDB = e.target.result; res(cacheDB); };
-    req.onerror = () => rej(req.error);
+    req.onerror   = () => rej(req.error);
   });
 }
 
@@ -335,36 +409,81 @@ function cacheKey(profileId, name) { return profileId + '::' + name; }
 async function cacheGet(profileId, name) {
   if (!cacheDB) return null;
   return new Promise(res => {
-    const tx = cacheDB.transaction(STORE, 'readonly');
+    const tx  = cacheDB.transaction(STORE, 'readonly');
     const req = tx.objectStore(STORE).get(cacheKey(profileId, name));
     req.onsuccess = () => res(req.result || null);
-    req.onerror = () => res(null);
+    req.onerror   = () => res(null);
   });
 }
 
 async function cachePut(profileId, name, data, mime) {
   if (!cacheDB) return;
+  const size = Math.ceil(data.length * 0.75);
+  await cacheEvictIfNeeded(size);
   return new Promise(res => {
     const tx = cacheDB.transaction(STORE, 'readwrite');
-    tx.objectStore(STORE).put({ key: cacheKey(profileId, name), data, mime, ts: Date.now() });
+    tx.objectStore(STORE).put({ key: cacheKey(profileId, name), data, mime, ts: Date.now(), size });
     tx.oncomplete = res; tx.onerror = res;
   });
 }
 
-async function cacheCount() {
-  if (!cacheDB) return 0;
+async function cacheEvictIfNeeded(neededBytes) {
+  if (!cacheDB) return;
+  const all = await new Promise(res => {
+    const tx  = cacheDB.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => res(req.result || []);
+    req.onerror   = () => res([]);
+  });
+  const totalSize = all.reduce((s, e) => s + (e.size || 0), 0);
+  if (totalSize + neededBytes <= CACHE_MAX_B) return;
+  const sorted = all.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  let freed = 0; const toDelete = [];
+  for (const entry of sorted) {
+    toDelete.push(entry.key); freed += entry.size || 0;
+    if (totalSize + neededBytes - freed <= CACHE_MAX_B) break;
+  }
+  await new Promise(res => {
+    const tx    = cacheDB.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    toDelete.forEach(k => store.delete(k));
+    tx.oncomplete = res; tx.onerror = res;
+  });
+}
+
+async function cacheGetAll() {
+  if (!cacheDB) return [];
   return new Promise(res => {
-    const tx = cacheDB.transaction(STORE, 'readonly');
-    const req = tx.objectStore(STORE).count();
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => res(0);
+    const tx  = cacheDB.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => res(req.result || []);
+    req.onerror   = () => res([]);
+  });
+}
+
+async function cacheDelete(profileId, name) {
+  if (!cacheDB) return;
+  return new Promise(res => {
+    const tx = cacheDB.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).delete(cacheKey(profileId, name));
+    tx.oncomplete = res; tx.onerror = res;
   });
 }
 
 async function updateCacheUI() {
-  const count = await cacheCount();
-  document.getElementById('cache-count').textContent = count + ' audio' + (count !== 1 ? 's' : '');
-  document.getElementById('cache-fill').style.width = Math.min(count * 8, 100) + '%';
+  const entries = await cacheGetAll();
+  const count   = entries.length;
+  const bytes   = entries.reduce((s, e) => s + (e.size || 0), 0);
+  const pct     = Math.min((bytes / CACHE_MAX_B) * 100, 100);
+  document.getElementById('cache-count').textContent =
+    count + ' audio' + (count !== 1 ? 's' : '') + ' · ' + fmtBytes(bytes);
+  document.getElementById('cache-fill').style.width = pct + '%';
+}
+
+function fmtBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(0) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
 }
 
 openCache().then(updateCacheUI);
@@ -372,20 +491,22 @@ openCache().then(updateCacheUI);
 // ── HELPERS ────────────────────────────────────────────
 function encodeKey(name) { return name.replace(/[.#$[\]/]/g, '_'); }
 
+let errorTimer = null;
 function showError(msg) {
   errorMsg.style.display = 'block';
-  errorMsg.textContent = '⚠️ ' + msg;
-  setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
+  errorMsg.textContent   = '⚠️ ' + msg;
+  clearTimeout(errorTimer);
+  errorTimer = setTimeout(() => { errorMsg.style.display = 'none'; }, 6000);
 }
 
+let currentHost = '';
+
 function setPlaying(name, host, isPlaying) {
-  npText.textContent = isPlaying ? name : 'En espera…';
-  hostNameEl.textContent = isPlaying && host ? 'Anfitrión/a: ' + host : '';
+  if (isPlaying) currentHost = host || currentHost;
+  npText.textContent      = isPlaying ? name : 'En espera…';
+  hostNameEl.textContent  = isPlaying && currentHost ? 'Asesora: ' + currentHost : '';
   card.classList.toggle('playing', isPlaying);
   waveform.classList.toggle('active', isPlaying);
-  // Update art
-  const art = card.querySelector('.np-art-wrap');
-  art.textContent = isPlaying ? '🎵' : '🎵';
 }
 
 function showFetch(show, text = 'Cargando audio…') {
@@ -393,64 +514,104 @@ function showFetch(show, text = 'Cargando audio…') {
   fetchInd.classList.toggle('show', show);
 }
 
-// ── AUDIO STATE ────────────────────────────────────────
-let currentAudio = null;
-let loopTimer    = null;
-let lastCmdId    = null;
-let queuedCmd    = null;
+// ── HEARTBEAT to Firebase so control.html can detect player ───
+let heartbeatTimer = null;
+function startHeartbeat(activated = false) {
+  const sendBeat = () => {
+    try {
+      set(ref(db, 'playerStatus'), { lastSeen: Date.now(), activated });
+    } catch(e) {}
+  };
+  sendBeat();
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+  heartbeatTimer = setInterval(sendBeat, 15000);
+}
 
-function stopAll(updateFB = true) {
-  if (currentAudio) {
-    currentAudio.onended = null;
-    currentAudio.pause();
-    currentAudio.src = '';
-    currentAudio = null;
+// ── AUTOPLAY UNLOCK ───────────────────────────────────
+let audioUnlocked = false;
+let pendingCmd = null;
+
+document.getElementById('unlock-btn').addEventListener('click', async () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = ctx.createBuffer(1, 1, 22050);
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.connect(ctx.destination); src.start(0);
+    await ctx.close();
+  } catch(e) {}
+
+  audioUnlocked = true;
+  document.getElementById('unlock-overlay').classList.add('hidden');
+  startHeartbeat(true); // mark as activated
+
+  if (pendingCmd) {
+    const p = pendingCmd; pendingCmd = null; dispatchCmd(p);
   }
+});
+
+// Start heartbeat right away (not yet activated)
+startHeartbeat(false);
+
+// ── AUDIO STATE ────────────────────────────────────────
+let currentAudio    = null;
+let currentName     = '';
+let loopActive      = false;
+let loopTimer       = null;
+let audioQueue      = [];
+let lastCmdId       = null;
+let playerReady     = false;
+
+async function stopAll(updateFB = true) {
+  loopActive = false;
   if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
-  queuedCmd = null;
+  if (currentAudio) {
+    currentAudio.onended = null; currentAudio.onerror = null;
+    currentAudio.pause(); currentAudio.src = ''; currentAudio = null;
+  }
+  audioQueue = []; currentName = '';
   setPlaying('', '', false);
   queueBadge.style.display = 'none';
   if (updateFB) {
-    set(ref(db, 'state/playing'), false);
-    set(ref(db, 'state/currentHost'), null);
+    await set(ref(db, 'state/playing'), false);
+    await set(ref(db, 'state/currentHost'), null);
+    await set(ref(db, 'state/paused'), false);
   }
 }
 
-// ── FETCH AUDIO (cache → Firebase) ────────────────────
+// ── FETCH AUDIO ───────────────────────────────────────
 async function getAudioSrc(profileId, name, mime) {
-  // 1. Try IndexedDB
   const cached = await cacheGet(profileId, name);
   if (cached) {
     console.log('[cache HIT]', name);
     return 'data:' + cached.mime + ';base64,' + cached.data;
   }
-
-  // 2. Fetch from Firebase
   console.log('[cache MISS] fetching from Firebase…', name);
   showFetch(true, 'Descargando "' + name + '"…');
   try {
-    const snap = await get(ref(db, `audio/${profileId}/${encodeKey(name)}`));
+    const snap  = await get(ref(db, `audio/${profileId}/${encodeKey(name)}`));
     const entry = snap.val();
-    if (!entry || !entry.data) {
-      showFetch(false);
-      return null;
-    }
-    await cachePut(profileId, name, entry.data, entry.mime || mime || 'audio/mpeg');
+    if (!entry || !entry.data) { showFetch(false); return null; }
+    const resolvedMime = entry.mime || mime || 'audio/mpeg';
+    await cachePut(profileId, name, entry.data, resolvedMime);
     await updateCacheUI();
     showFetch(false);
-    console.log('[cached locally]', name);
-    return 'data:' + (entry.mime || mime || 'audio/mpeg') + ';base64,' + entry.data;
+    return 'data:' + resolvedMime + ';base64,' + entry.data;
   } catch(e) {
     showFetch(false);
-    console.error('Firebase fetch failed', e);
     return null;
   }
 }
 
-// Pre-fetch audio in background (called for queue items)
 async function prefetch(profileId, name, mime) {
   const cached = await cacheGet(profileId, name);
-  if (!cached) { await getAudioSrc(profileId, name, mime); }
+  if (cached) return;
+  try {
+    const snap  = await get(ref(db, `audio/${profileId}/${encodeKey(name)}`));
+    const entry = snap.val();
+    if (!entry || !entry.data) return;
+    await cachePut(profileId, name, entry.data, entry.mime || mime || 'audio/mpeg');
+    await updateCacheUI();
+  } catch(e) {}
 }
 
 // ── PLAY AUDIO ─────────────────────────────────────────
@@ -463,12 +624,14 @@ async function playAudio(profileId, name, mime, host, onEnd) {
     return;
   }
 
-  if (currentAudio) { currentAudio.onended = null; currentAudio.pause(); }
+  if (currentAudio) {
+    currentAudio.onended = null; currentAudio.onerror = null; currentAudio.pause();
+  }
 
-  const audio = new Audio(src);
-  currentAudio = audio;
-  const displayName = name.replace(/\.[^.]+$/, '');
-  setPlaying(displayName, host, true);
+  const audio     = new Audio(src);
+  currentAudio    = audio;
+  currentName     = name.replace(/\.[^.]+$/, '');
+  setPlaying(currentName, host, true);
 
   audio.play().catch(e => {
     showError('Error al reproducir: ' + e.message);
@@ -478,83 +641,108 @@ async function playAudio(profileId, name, mime, host, onEnd) {
 
   audio.onended = () => {
     if (currentAudio !== audio) return;
-    setPlaying('', '', false);
+    currentAudio = null; setPlaying('', '', false);
     if (onEnd) onEnd();
   };
   audio.onerror = () => {
-    showError('Error en el audio: ' + name);
+    if (currentAudio !== audio) return;
+    currentAudio = null; showError('Error en el audio: ' + name);
+    setPlaying('', '', false);
     if (onEnd) onEnd();
   };
 }
 
-// ── CMD LISTENER ───────────────────────────────────────
-onValue(ref(db, 'cmd'), async (snap) => {
-  const d = snap.val();
-  if (!d || d.id === lastCmdId) return;
-  lastCmdId = d.id;
+async function playNextInQueue() {
+  if (audioQueue.length === 0) {
+    set(ref(db, 'state/playing'), false);
+    set(ref(db, 'state/currentHost'), null);
+    queueBadge.style.display = 'none';
+    return;
+  }
+  const q = audioQueue.shift();
+  updateQueueBadge();
+  set(ref(db, 'state/playing'), true);
+  set(ref(db, 'state/currentHost'), q.host || null);
+  await playAudio(q.profileId, q.name, q.mime, q.host, playNextInQueue);
+}
 
+function updateQueueBadge() {
+  if (audioQueue.length === 0) { queueBadge.style.display = 'none'; return; }
+  queueBadge.style.display = 'block';
+  const names = audioQueue.map(q => q.name.replace(/\.[^.]+$/, '')).join(', ');
+  queueBadge.textContent = `⏭ En cola (${audioQueue.length}): ${names}`;
+}
+
+// ── CMD LISTENER ───────────────────────────────────────
+function initCmdListener() {
+  onValue(ref(db, 'cmd'), (seedSnap) => {
+    const seed = seedSnap.val();
+    if (seed && seed.id) lastCmdId = seed.id;
+    playerReady = true;
+
+    if (window._cmdUnsub) window._cmdUnsub();
+    window._cmdUnsub = onValue(ref(db, 'cmd'), async (snap) => {
+      if (!playerReady) return;
+      const d = snap.val();
+      if (!d || d.id === lastCmdId) return;
+      lastCmdId = d.id;
+
+      if (!audioUnlocked && (d.action === 'play' || d.action === 'loop' || d.action === 'queue')) {
+        pendingCmd = d;
+        document.getElementById('unlock-sub').textContent = '▶ Audio listo — toca para reproducir';
+        return;
+      }
+
+      await dispatchCmd(d);
+    });
+  }, { onlyOnce: true });
+}
+
+async function dispatchCmd(d) {
   const { action, host, name, mime, interval, profileId } = d;
 
   if (action === 'play') {
+    loopActive = false;
     if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
-    queueBadge.style.display = 'none';
+    audioQueue = []; updateQueueBadge();
     set(ref(db, 'state/playing'), true);
     set(ref(db, 'state/currentHost'), host || null);
-
-    await playAudio(profileId, name, mime, host, () => {
-      set(ref(db, 'state/playing'), false);
-      set(ref(db, 'state/currentHost'), null);
-
-      if (queuedCmd) {
-        const q = queuedCmd; queuedCmd = null;
-        queueBadge.style.display = 'none';
-        set(ref(db, 'state/playing'), true);
-        playAudio(q.profileId, q.name, q.mime, q.host, () => {
-          set(ref(db, 'state/playing'), false);
-          set(ref(db, 'state/currentHost'), null);
-        });
-      }
-    });
+    await playAudio(profileId, name, mime, host, playNextInQueue);
 
   } else if (action === 'queue') {
-    if (!currentAudio || currentAudio.ended) {
+    if (!currentAudio || currentAudio.ended || currentAudio.paused) {
       set(ref(db, 'state/playing'), true);
       set(ref(db, 'state/currentHost'), host || null);
-      await playAudio(profileId, name, mime, host, () => {
-        set(ref(db, 'state/playing'), false);
-        set(ref(db, 'state/currentHost'), null);
-      });
+      await playAudio(profileId, name, mime, host, playNextInQueue);
     } else {
-      queuedCmd = { profileId, name, mime, host };
-      queueBadge.style.display = 'block';
-      queueBadge.textContent = '⏭ En cola: ' + name.replace(/\.[^.]+$/, '');
-      prefetch(profileId, name, mime); // pre-cache in background
+      audioQueue.push({ profileId, name, mime, host });
+      updateQueueBadge();
+      prefetch(profileId, name, mime);
     }
 
   } else if (action === 'loop') {
+    loopActive = false;
     if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
     const ms = (interval || 120) * 1000;
-
+    loopActive = true;
     const doLoop = async () => {
-      if (loopTimer === null) return;
+      if (!loopActive) return;
       set(ref(db, 'state/playing'), true);
-      // Use the actual name (without emoji prefix) for fetching audio
       await playAudio(profileId, name, mime, host, () => {
+        if (!loopActive) { set(ref(db, 'state/playing'), false); return; }
         set(ref(db, 'state/playing'), false);
         loopTimer = setTimeout(doLoop, ms);
       });
     };
-
-    loopTimer = true; // sentinel so doLoop knows it's active
     doLoop();
 
   } else if (action === 'pause') {
-    if (currentAudio) {
+    if (currentAudio && !currentAudio.paused) {
       currentAudio.pause();
-      // Get the current clean name before any mutation
-      const cleanName = npText.textContent.replace(/^⏸\s*/, '');
-      setPlaying(cleanName, '', false);
-      npText.textContent = '⏸ ' + cleanName;
+      const cleanName = currentName || npText.textContent.replace(/^⏸\s*/, '');
+      card.classList.remove('playing'); waveform.classList.remove('active');
+      npText.textContent     = '⏸ ' + cleanName;
+      hostNameEl.textContent = currentHost ? 'Asesora: ' + currentHost : '';
       set(ref(db, 'state/playing'), false);
       set(ref(db, 'state/paused'), true);
     }
@@ -562,26 +750,40 @@ onValue(ref(db, 'cmd'), async (snap) => {
   } else if (action === 'resume') {
     if (currentAudio) {
       currentAudio.play().catch(e => showError('Error al reanudar: ' + e.message));
+      const cleanName = currentName || npText.textContent.replace(/^⏸\s*/, '');
+      npText.textContent     = cleanName;
+      hostNameEl.textContent = currentHost ? 'Asesora: ' + currentHost : '';
+      card.classList.add('playing'); waveform.classList.add('active');
       set(ref(db, 'state/playing'), true);
       set(ref(db, 'state/paused'), false);
-      waveform.classList.add('active');
-      card.classList.add('playing');
     }
 
   } else if (action === 'stop') {
     stopAll(true);
+  } else if (action === 'delete') {
+    if (profileId && name) await cacheDelete(profileId, name);
+    await updateCacheUI();
   }
+}
+
+// ── CONNECTIVITY ──────────────────────────────────────
+onValue(ref(db, '.info/connected'), snap => {
+  const connected = snap.val() === true;
+  dot.classList.toggle('ok', connected);
+  statusText.textContent = connected ? 'Conectado' : 'Reconectando…';
 });
 
-// ── CLEANUP stale paused state on load ─────────────────
+// ── CLEANUP stale paused state ─────────────────────────
 onValue(ref(db, 'state'), snap => {
   const s = snap.val() || {};
-  // If player reloads while paused, clear the stale state
   if (s.paused && !currentAudio) {
     set(ref(db, 'state/paused'), false);
     set(ref(db, 'state/playing'), false);
   }
 }, { onlyOnce: true });
+
+// ── BOOT ──────────────────────────────────────────────
+initCmdListener();
 </script>
 </body>
 </html>

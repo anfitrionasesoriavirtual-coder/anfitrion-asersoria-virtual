@@ -3,542 +3,607 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Asesorías UTPL — Control</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>Anfitrión — Control</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%236c5ce7'/><stop offset='100%25' stop-color='%2300d2a8'/></linearGradient></defs><rect width='64' height='64' rx='16' fill='url(%23g)'/><text x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-size='36'>🎙️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
-  --bg: #080810;
-  --s1: #0f0f1a;
-  --s2: #161625;
-  --s3: #1e1e30;
-  --border: #ffffff0f;
-  --border2: #ffffff18;
-  --accent: #7c6bff;
-  --accent2: #a78bfa;
-  --glow: rgba(124,107,255,.25);
-  --green: #10d4a0;
-  --green-dim: rgba(16,212,160,.12);
-  --red: #ff4f6a;
-  --red-dim: rgba(255,79,106,.12);
-  --yellow: #f5a623;
-  --yellow-dim: rgba(245,166,35,.1);
-  --text: #f0f0f8;
-  --muted: #6a6a88;
-  --muted2: #4a4a66;
-  --r: 18px;
+  --bg: #07070f;
+  --s1: #0e0e1c;
+  --s2: #141426;
+  --s3: #1a1a30;
+  --s4: #222238;
+  --border: #ffffff0a;
+  --border2: #ffffff14;
+  --border3: #ffffff20;
+  --accent: #6c5ce7;
+  --accent2: #a29bfe;
+  --accent3: #4834d4;
+  --glow: rgba(108,92,231,.22);
+  --green: #00d2a8;
+  --green-dim: rgba(0,210,168,.1);
+  --red: #ff4757;
+  --red-dim: rgba(255,71,87,.1);
+  --yellow: #ffa502;
+  --yellow-dim: rgba(255,165,2,.1);
+  --text: #eeeef8;
+  --text2: #b0b0cc;
+  --muted: #6060880;
+  --muted: #606088;
+  --muted2: #3c3c58;
+  --r: 16px;
   --r-sm: 10px;
+  --r-xs: 7px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-tap-highlight-color:transparent}
+html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
 
 body{
-  font-family:'DM Sans',sans-serif;
+  font-family:'Outfit',sans-serif;
   background:var(--bg);
   color:var(--text);
   min-height:100vh;
   overflow-x:hidden;
 }
 
-/* ─── BACKGROUND ─── */
 body::before{
-  content:'';
-  position:fixed;inset:0;
+  content:'';position:fixed;inset:0;
   background:
-    radial-gradient(ellipse 60% 40% at 10% 0%, rgba(124,107,255,.12) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 60% at 90% 100%, rgba(16,212,160,.07) 0%, transparent 70%);
+    radial-gradient(ellipse 70% 50% at 5% 0%, rgba(108,92,231,.1) 0%,transparent 65%),
+    radial-gradient(ellipse 60% 70% at 95% 100%, rgba(0,210,168,.06) 0%,transparent 65%);
   pointer-events:none;z-index:0;
 }
 
-/* ─── SPLASH SCREEN ─── */
+/* ─── SPLASH ─── */
 #splash{
-  position:fixed;inset:0;z-index:200;
+  position:fixed;inset:0;z-index:300;
   background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;
   transition:opacity .5s ease, visibility .5s ease;
 }
-#splash.hidden{opacity:0;visibility:hidden}
-
-.splash-logo{
-  width:80px;height:80px;
-  border-radius:24px;
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.splash-icon{
+  width:72px;height:72px;border-radius:22px;
   background:linear-gradient(135deg,var(--accent),var(--green));
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  box-shadow:0 16px 50px var(--glow);
+  animation:breathe 2s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{box-shadow:0 16px 50px var(--glow)}50%{box-shadow:0 16px 70px rgba(108,92,231,.45)}}
+.splash-label{font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+.splash-sub{font-size:.8rem;color:var(--muted);font-weight:400}
+.splash-track{width:160px;height:2px;background:var(--s3);border-radius:99px;overflow:hidden}
+.splash-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;animation:sload 1.4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes sload{0%{width:0}100%{width:100%}}
+
+/* ─── MODAL OVERLAY ─── */
+.modal-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(7,7,15,.85);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
   display:flex;align-items:center;justify-content:center;
-  font-size:2.4rem;
-  box-shadow:0 20px 60px var(--glow);
-  animation:splashPulse 2s ease-in-out infinite;
+  padding:1rem;
+  opacity:0;visibility:hidden;
+  transition:opacity .25s ease, visibility .25s ease;
 }
-@keyframes splashPulse{0%,100%{box-shadow:0 20px 60px var(--glow)}50%{box-shadow:0 20px 80px rgba(124,107,255,.45)}}
+.modal-overlay.open{opacity:1;visibility:visible}
 
-.splash-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
-.splash-sub{font-size:.85rem;color:var(--muted);font-weight:400}
+.modal-box{
+  background:var(--s1);
+  border:1px solid var(--border3);
+  border-radius:24px;
+  padding:1.8rem;
+  width:min(440px,100%);
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+  transform:translateY(20px) scale(.96);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-overlay.open .modal-box{transform:translateY(0) scale(1)}
 
-.splash-bar-track{
-  width:180px;height:3px;
-  background:var(--s3);border-radius:99px;overflow:hidden;
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.4rem;
 }
-.splash-bar-fill{
-  height:100%;border-radius:99px;
-  background:linear-gradient(90deg,var(--accent),var(--green));
-  animation:splashLoad 1.4s cubic-bezier(.4,0,.2,1) forwards;
+.modal-title{font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+.modal-close{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--s3);border:1px solid var(--border2);
+  color:var(--muted);font-size:.9rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
 }
-@keyframes splashLoad{0%{width:0}100%{width:100%}}
+.modal-close:hover{background:var(--red-dim);border-color:rgba(255,71,87,.3);color:var(--red)}
+
+.icon-picker{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.2rem}
+.icon-opt{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  cursor:pointer;border:2px solid transparent;transition:all .15s;
+}
+.icon-opt:hover{transform:scale(1.1)}
+.icon-opt.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,92,231,.25)}
+
+.form-label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem;display:block}
+.form-input{
+  width:100%;padding:.8rem 1rem;
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:12px;color:var(--text);
+  font-family:'Outfit',sans-serif;font-size:.95rem;
+  outline:none;margin-bottom:1.1rem;
+  transition:border-color .15s, box-shadow .15s;
+}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,92,231,.12)}
+.form-input::placeholder{color:var(--muted2)}
+
+.modal-footer{display:flex;gap:8px}
 
 /* ─── PROFILE SCREEN ─── */
 #profile-screen{
-  display:none;
-  min-height:100vh;
+  display:none;min-height:100vh;
   position:relative;z-index:1;
-  padding:3rem 1.5rem 2rem;
+  padding:2rem 1.2rem 2rem;
+  max-width:640px;margin:0 auto;
 }
 
-.profile-header{
-  text-align:center;
-  margin-bottom:2.5rem;
+.page-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.8rem;
+  gap:1rem;
 }
-
-.ps-logo{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:64px;height:64px;border-radius:20px;
+.page-brand{display:flex;align-items:center;gap:10px}
+.brand-icon{
+  width:42px;height:42px;border-radius:14px;
   background:linear-gradient(135deg,var(--accent),var(--green));
-  font-size:2rem;margin-bottom:1rem;
-  box-shadow:0 12px 40px var(--glow);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  box-shadow:0 6px 24px var(--glow);
 }
+.brand-text{font-size:1rem;font-weight:700;letter-spacing:-.02em}
+.brand-sub{font-size:.7rem;color:var(--muted);font-weight:400}
 
-.profile-header h1{
-  font-size:1.8rem;font-weight:700;letter-spacing:-.03em;
-  margin-bottom:.4rem;
+/* QR integrado en el header superior */
+.qr-inline{
+  display:flex;align-items:center;gap:.8rem;
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:14px;padding:.7rem .9rem;
+  cursor:pointer;transition:all .2s;
+  position:relative;
 }
-
-.profile-header p{font-size:.9rem;color:var(--muted);font-weight:400}
-
-/* ─── STORAGE BANNER ─── */
-.storage-banner{
-  max-width:560px;margin:0 auto 2rem;
-  background:var(--s1);
-  border:1px solid var(--border2);
-  border-radius:var(--r);
-  padding:1rem 1.2rem;
+.qr-inline:hover{border-color:var(--accent2);background:var(--s2)}
+.qr-inline-canvas{
+  width:52px;height:52px;border-radius:8px;
+  background:#fff;padding:3px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
 }
+.qr-inline-canvas canvas,.qr-inline-canvas img{width:46px!important;height:46px!important}
+.qr-label{font-size:.68rem;color:var(--muted);line-height:1.4;max-width:90px}
+.qr-label strong{display:block;color:var(--text2);font-size:.75rem;font-weight:600;margin-bottom:2px}
 
-.sb-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
-.sb-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
-.sb-val{font-size:.82rem;font-weight:700;font-family:'Space Mono',monospace}
+/* Storage banner compacto */
+.storage-compact{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:.85rem 1rem;margin-bottom:1.4rem;
+}
+.sc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.sc-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+.sc-val{font-size:.75rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.sc-track{height:4px;background:var(--s3);border-radius:99px;overflow:hidden;display:flex;gap:2px}
+.sc-seg{height:100%;border-radius:99px;transition:width .4s ease;flex-shrink:0}
+.sc-legend{display:flex;flex-wrap:wrap;gap:.4rem .9rem;margin-top:.5rem}
+.sc-leg{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--muted)}
+.sc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
-.sb-track{height:5px;background:var(--s3);border-radius:99px;overflow:hidden;display:flex;gap:2px}
-.sb-seg{height:100%;border-radius:99px;transition:width .4s ease}
+/* Sección perfiles */
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:.9rem;
+}
+.section-heading{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 
-.sb-legend{display:flex;flex-wrap:wrap;gap:.6rem 1.2rem;margin-top:.6rem}
-.sb-leg-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--muted)}
-.sb-leg-dot{width:7px;height:7px;border-radius:50%}
+/* ─── PLAYER STATUS BANNER ─── */
+.player-status-banner{
+  border-radius:12px;padding:.65rem 1rem;
+  font-size:.8rem;font-weight:500;
+  margin-bottom:1rem;
+  display:flex;align-items:center;gap:8px;
+}
+.player-status-banner.ok{background:var(--green-dim);border:1px solid rgba(0,210,168,.2);color:var(--green)}
+.player-status-banner.warn{background:var(--yellow-dim);border:1px solid rgba(255,165,2,.2);color:var(--yellow)}
+.player-status-banner.err{background:var(--red-dim);border:1px solid rgba(255,71,87,.2);color:var(--red)}
+.psb-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ─── PROFILE GRID ─── */
+/* ─── PROFILES GRID ─── */
 .profiles-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-  gap:1rem;
-  max-width:560px;margin:0 auto 1.5rem;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:1rem;margin-bottom:1rem;
 }
 @media(max-width:380px){.profiles-grid{grid-template-columns:repeat(2,1fr)}}
 
 .profile-card{
-  background:var(--s1);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:1.4rem .8rem 1.1rem;
-  display:flex;flex-direction:column;align-items:center;gap:.6rem;
-  cursor:pointer;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.6rem 1rem 1.3rem;
+  display:flex;flex-direction:column;align-items:center;gap:.7rem;
+  cursor:pointer;text-align:center;position:relative;overflow:hidden;
   transition:all .25s cubic-bezier(.34,1.56,.64,1);
-  position:relative;text-align:center;
-  overflow:hidden;
 }
 .profile-card::before{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg, rgba(124,107,255,.08), transparent);
+  background:linear-gradient(135deg,rgba(108,92,231,.07),transparent);
   opacity:0;transition:opacity .2s;
 }
-.profile-card:hover{
-  border-color:var(--accent2);
-  transform:translateY(-5px) scale(1.02);
-  box-shadow:0 16px 40px var(--glow);
-}
+.profile-card:hover{border-color:var(--accent2);transform:translateY(-4px) scale(1.02);box-shadow:0 12px 36px var(--glow)}
 .profile-card:hover::before{opacity:1}
-.profile-card.last-used{
-  border-color:var(--accent);
-  box-shadow:0 0 0 1px var(--accent), 0 8px 32px var(--glow);
-}
+.profile-card.last-used{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 6px 28px var(--glow)}
 
 .pc-avatar{
-  width:64px;height:64px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.8rem;position:relative;
-  transition:transform .2s;
+  width:72px;height:72px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  position:relative;transition:transform .2s;
 }
-.profile-card:hover .pc-avatar{transform:scale(1.08)}
+.profile-card:hover .pc-avatar{transform:scale(1.1)}
 
-.pc-delete{
-  position:absolute;top:8px;right:8px;
-  width:22px;height:22px;border-radius:50%;
-  background:rgba(255,79,106,.15);border:1px solid rgba(255,79,106,.3);
-  color:var(--red);font-size:10px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .15s;
-  z-index:2;
-}
-.profile-card:hover .pc-delete{opacity:1}
-
-.pc-online{
-  position:absolute;top:2px;right:2px;
+/* online/offline dot del avatar */
+.pc-presence{
+  position:absolute;bottom:2px;right:2px;
   width:12px;height:12px;border-radius:50%;
   border:2px solid var(--s1);
 }
-.pc-online.on{background:var(--green);box-shadow:0 0 8px var(--green)}
-.pc-online.off{background:var(--muted2)}
+.pc-presence.on{background:var(--green);box-shadow:0 0 7px var(--green)}
+.pc-presence.busy{background:var(--yellow);box-shadow:0 0 7px var(--yellow);animation:pulse 1.5s ease infinite}
+.pc-presence.off{background:var(--muted2)}
 
-.pc-name{font-size:.82rem;font-weight:600;line-height:1.2;word-break:break-word}
-.pc-size{font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace}
+.pc-delete{
+  position:absolute;top:7px;right:7px;
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.25);
+  color:var(--red);font-size:.7rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s;z-index:2;
+}
+.profile-card:hover .pc-delete{opacity:1}
+
+.pc-name{font-size:.8rem;font-weight:600;line-height:1.2;word-break:break-word;color:var(--text)}
+.pc-size{font-size:.63rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.pc-using-tag{
+  font-size:.6rem;padding:2px 7px;border-radius:20px;font-weight:600;
+  background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(255,165,2,.2);
+}
 
 .pc-add{
-  background:transparent;
-  border:2px dashed var(--border2);
-  border-radius:var(--r);
-  padding:1.4rem .8rem 1.1rem;
-  display:flex;flex-direction:column;align-items:center;gap:.6rem;
-  cursor:pointer;color:var(--muted);font-size:.82rem;
-  transition:all .2s;
+  background:transparent;border:2px dashed var(--border2);
+  border-radius:var(--r);padding:1.6rem 1rem 1.3rem;
+  display:flex;flex-direction:column;align-items:center;gap:.7rem;
+  cursor:pointer;color:var(--muted);font-size:.8rem;transition:all .2s;
 }
 .pc-add:hover{border-color:var(--accent);color:var(--accent)}
 .pc-add-icon{
-  width:64px;height:64px;border-radius:50%;
-  background:var(--s2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.6rem;transition:background .2s;
+  width:72px;height:72px;border-radius:50%;background:var(--s2);
+  display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+  transition:background .2s;
 }
-.pc-add:hover .pc-add-icon{background:rgba(124,107,255,.15)}
+.pc-add:hover .pc-add-icon{background:rgba(108,92,231,.15)}
 
-/* ─── NEW PROFILE FORM ─── */
-#new-profile-form{
-  display:none;
-  max-width:560px;margin:0 auto 1.5rem;
-  background:var(--s1);border:1px solid var(--border2);
-  border-radius:var(--r);padding:1.4rem;
-}
-#new-profile-form h3{font-size:.95rem;font-weight:700;margin-bottom:1rem;letter-spacing:-.01em}
-
-.icon-picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem}
-.icon-opt{
-  width:44px;height:44px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.3rem;cursor:pointer;
-  border:2px solid transparent;
-  transition:all .15s;
-}
-.icon-opt.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,107,255,.3)}
-
-.form-input{
-  width:100%;padding:.75rem 1rem;
-  background:var(--s2);border:1px solid var(--border2);
-  border-radius:10px;color:var(--text);
-  font-family:'DM Sans',sans-serif;font-size:.9rem;
-  outline:none;margin-bottom:.8rem;
-  transition:border-color .15s;
-}
-.form-input:focus{border-color:var(--accent)}
-.form-input::placeholder{color:var(--muted2)}
-
-.form-row{display:flex;gap:8px}
-
-/* ─── QR PANEL ─── */
-.qr-panel{
-  max-width:560px;margin:0 auto 2rem;
-  background:var(--s1);border:1px solid var(--border2);
-  border-radius:var(--r);padding:1.2rem;
-  display:flex;align-items:center;gap:1.2rem;
-}
-#qr-canvas{
-  width:80px;height:80px;border-radius:10px;
-  background:#fff;padding:4px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-}
-#qr-canvas canvas, #qr-canvas img{width:72px!important;height:72px!important}
-.qr-info h4{font-size:.85rem;font-weight:700;margin-bottom:.25rem}
-.qr-info p{font-size:.75rem;color:var(--muted);line-height:1.4}
-.qr-url{font-size:.65rem;color:var(--accent2);font-family:'Space Mono',monospace;margin-top:.3rem;word-break:break-all}
-
-/* ─── LOADING SCREEN ─── */
+/* ─── LOADING ─── */
 #loading-screen{
-  display:none;
-  position:fixed;inset:0;z-index:150;
+  display:none;position:fixed;inset:0;z-index:150;
   background:var(--bg);
-  flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;
-  animation:fadeIn .3s ease;
+  flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;
+  animation:fadein .3s ease;
 }
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-
+@keyframes fadein{from{opacity:0}to{opacity:1}}
 .ls-avatar{
-  width:88px;height:88px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:2.8rem;
-  animation:popIn .5s cubic-bezier(.34,1.56,.64,1);
+  width:80px;height:80px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:2.4rem;
+  animation:popin .5s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-
-.ls-name{font-size:1.4rem;font-weight:700;letter-spacing:-.02em}
-.ls-sub{font-size:.82rem;color:var(--muted)}
-
-.ls-bar-track{width:200px;height:3px;background:var(--s3);border-radius:99px;overflow:hidden}
-.ls-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;animation:lsLoad 1.3s ease forwards}
-@keyframes lsLoad{0%{width:0}100%{width:100%}}
+@keyframes popin{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.ls-name{font-size:1.3rem;font-weight:700;letter-spacing:-.02em}
+.ls-sub{font-size:.8rem;color:var(--muted)}
+.ls-track{width:180px;height:2px;background:var(--s3);border-radius:99px;overflow:hidden}
+.ls-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;animation:sload 1.3s ease forwards}
 
 /* ─── MAIN SCREEN ─── */
 #main-screen{
-  display:none;
-  max-width:480px;margin:0 auto;
-  padding:0 1rem 3rem;
+  display:none;max-width:680px;margin:0 auto;
+  padding:0 1.2rem 3rem;min-height:100vh;
   position:relative;z-index:1;
-  min-height:100vh;
 }
 
-/* Header */
 .app-header{
   display:flex;align-items:center;gap:10px;
-  padding:.85rem 0;
-  border-bottom:1px solid var(--border);
-  margin-bottom:1rem;
-  position:sticky;top:0;
-  background:rgba(8,8,16,.92);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
+  padding:.8rem 0;border-bottom:1px solid var(--border);
+  margin-bottom:1rem;position:sticky;top:0;
+  background:rgba(7,7,15,.94);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   z-index:20;
 }
 .h-avatar{
-  width:40px;height:40px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;flex-shrink:0;
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;
 }
-.h-name{font-weight:700;font-size:.95rem}
-.h-role{font-size:.7rem;color:var(--muted)}
-
+.h-name{font-weight:700;font-size:.9rem}
+.h-role{font-size:.65rem;color:var(--muted);font-weight:400}
 .back-btn{
-  margin-left:auto;
-  background:var(--s2);border:1px solid var(--border2);
-  color:var(--muted);border-radius:8px;
-  padding:.4rem .8rem;font-size:.75rem;
-  cursor:pointer;font-family:'DM Sans',sans-serif;
-  transition:all .15s;
+  margin-left:auto;background:var(--s2);border:1px solid var(--border2);
+  color:var(--muted);border-radius:8px;padding:.4rem .75rem;
+  font-size:.72rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;
 }
 .back-btn:hover{color:var(--text);border-color:var(--muted2)}
 
-/* Storage widget */
-.storage-widget{
+/* Storage mini */
+.storage-mini{
   background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.8rem;
+  border-radius:var(--r);padding:.7rem .9rem;margin-bottom:.75rem;
 }
-.sw-row{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:.4rem}
-.sw-label{color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-.sw-val{font-weight:700;font-family:'Space Mono',monospace}
+.sm-row{display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.35rem}
+.sm-label{color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.sm-val{font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.sm-track{height:4px;background:var(--s3);border-radius:99px;overflow:hidden;margin:.35rem 0}
+.sm-fill{height:100%;border-radius:99px;transition:width .4s ease}
+.sm-fill.ok{background:linear-gradient(90deg,var(--accent),var(--green))}
+.sm-fill.warn{background:linear-gradient(90deg,var(--yellow),#ff7c00)}
+.sm-fill.danger{background:linear-gradient(90deg,var(--red),#ff6b6b)}
+.sm-hint{font-size:.67rem;color:var(--muted)}
 
-.sw-track{height:5px;background:var(--s3);border-radius:99px;overflow:hidden;margin:.4rem 0}
-.sw-fill{height:100%;border-radius:99px;transition:width .4s ease}
-.sw-fill.ok{background:linear-gradient(90deg,var(--accent),var(--green))}
-.sw-fill.warn{background:linear-gradient(90deg,var(--yellow),#ff8c00)}
-.sw-fill.danger{background:linear-gradient(90deg,var(--red),#ff6b6b)}
-.sw-hint{font-size:.7rem;color:var(--muted)}
+/* Now playing — barra discreta */
+#now-playing-bar{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:.7rem 1rem;margin-bottom:.75rem;
+  position:relative;overflow:hidden;transition:all .3s;
+  display:none;
+}
+#now-playing-bar.active{display:block;border-color:rgba(108,92,231,.2)}
+#now-playing-bar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--green));
+}
+.np-bar-row{display:flex;align-items:center;gap:.7rem}
+.np-wave-mini{display:flex;align-items:center;gap:2px;height:16px;flex-shrink:0}
+.np-wave-bar{width:2px;border-radius:99px;background:var(--accent2);opacity:.8}
+.np-wave-bar:nth-child(1){animation:wv 1s .00s ease-in-out infinite}
+.np-wave-bar:nth-child(2){animation:wv 1s .12s ease-in-out infinite}
+.np-wave-bar:nth-child(3){animation:wv 1s .22s ease-in-out infinite}
+@keyframes wv{0%,100%{height:2px}50%{height:14px}}
+.np-bar-info{flex:1;min-width:0}
+.np-bar-title{font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-bar-host{font-size:.65rem;color:var(--muted)}
+.np-bar-controls{display:flex;gap:5px;flex-shrink:0}
+.np-ctrl{
+  padding:.35rem .7rem;border-radius:8px;font-size:.72rem;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;border:1px solid var(--border2);
+  background:var(--s2);color:var(--text2);
+}
+.np-ctrl:hover{background:var(--s3)}
+.np-ctrl.stop{border-color:rgba(255,71,87,.3);color:var(--red)}
+.np-ctrl.stop:hover{background:var(--red-dim)}
 
 /* Blocked banner */
 #blocked-banner{
-  display:none;
-  background:var(--yellow-dim);
-  border:1px solid rgba(245,166,35,.25);
-  border-radius:12px;padding:.7rem 1rem;
-  font-size:.82rem;color:var(--yellow);
-  margin-bottom:.8rem;text-align:center;
+  display:none;background:var(--yellow-dim);border:1px solid rgba(255,165,2,.2);
+  border-radius:12px;padding:.6rem 1rem;font-size:.78rem;color:var(--yellow);
+  margin-bottom:.75rem;align-items:center;gap:8px;
 }
-
-/* Now playing */
-#now-playing-card{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);padding:1rem;margin-bottom:.8rem;
-  position:relative;overflow:hidden;
-  transition:border-color .3s;
-}
-#now-playing-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--accent),var(--green));
-  opacity:0;transition:opacity .3s;
-}
-#now-playing-card.active{border-color:rgba(124,107,255,.3)}
-#now-playing-card.active::before{opacity:1}
-
-.np-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:3px}
-.np-title{font-weight:600;font-size:.95rem;margin-bottom:.7rem;color:var(--text)}
-
-.np-controls{display:flex;gap:6px}
-.ctrl-btn{
-  flex:1;padding:.55rem;
-  background:var(--s2);border:1px solid var(--border2);
-  border-radius:10px;color:var(--text);
-  font-size:.78rem;cursor:pointer;
-  font-family:'DM Sans',sans-serif;
-  transition:all .15s;font-weight:500;
-}
-.ctrl-btn:hover{background:var(--s3)}
-.ctrl-btn.danger{border-color:rgba(255,79,106,.3);color:var(--red)}
-.ctrl-btn.danger:hover{background:var(--red-dim)}
+#blocked-banner.show{display:flex}
 
 /* Section title */
 .section-title{
-  font-size:.68rem;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.08em;
-  margin:1rem 0 .5rem;
+  font-size:.65rem;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.09em;margin:.9rem 0 .5rem;
 }
 
 /* Upload zone */
 #drop-zone{
-  border:2px dashed var(--border2);
-  border-radius:var(--r);padding:1.2rem;
-  text-align:center;font-size:.85rem;color:var(--muted);
-  cursor:pointer;transition:all .2s;margin-bottom:.8rem;
-  position:relative;overflow:hidden;
+  border:2px dashed var(--border2);border-radius:var(--r);
+  padding:1.1rem;text-align:center;font-size:.85rem;color:var(--muted);
+  cursor:pointer;transition:all .2s;margin-top:.5rem;margin-bottom:2rem;
+  background:transparent;
 }
-#drop-zone:hover,#drop-zone.dragover{
-  border-color:var(--accent);color:var(--accent);
-  background:rgba(124,107,255,.05);
-}
-#drop-zone .dz-icon{font-size:1.5rem;margin-bottom:.3rem;display:block}
-#drop-zone .dz-hint{font-size:.72rem;color:var(--muted2);margin-top:.2rem}
+#drop-zone:hover,#drop-zone.dragover{border-color:var(--accent);color:var(--accent2);background:rgba(108,92,231,.04)}
+#drop-zone .dz-icon{font-size:1.3rem;margin-bottom:.25rem;display:block}
+#drop-zone .dz-hint{font-size:.68rem;color:var(--muted2);margin-top:.2rem}
 #file-input{display:none}
 
-/* Compression status */
+/* Compress status */
 #compress-status{
+  background:rgba(108,92,231,.1);border:1px solid rgba(108,92,231,.2);
+  border-radius:10px;padding:.5rem .9rem;font-size:.75rem;color:var(--accent2);
+  margin-bottom:.75rem;align-items:center;gap:8px;
   display:none;
-  background:rgba(124,107,255,.1);
-  border:1px solid rgba(124,107,255,.25);
-  border-radius:10px;padding:.6rem 1rem;
-  font-size:.78rem;color:var(--accent2);
-  margin-bottom:.8rem;text-align:center;
 }
+#compress-status .cs-spin{
+  width:10px;height:10px;border-radius:50%;
+  border:2px solid rgba(108,92,231,.2);border-top-color:var(--accent2);
+  animation:cspin .7s linear infinite;flex-shrink:0;
+}
+@keyframes cspin{to{transform:rotate(360deg)}}
+#compress-status .cs-close{
+  margin-left:auto;cursor:pointer;opacity:.6;font-size:.75rem;transition:opacity .15s;
+}
+#compress-status .cs-close:hover{opacity:1}
 
 /* Audio list */
-#audio-list{display:flex;flex-direction:column;gap:8px;padding-bottom:2rem}
+#audio-list{
+  display:flex;flex-direction:column;gap:12px;padding-bottom:1rem;
+}
 
 .audio-item{
   background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);overflow:hidden;
-  transition:border-color .2s, box-shadow .2s;
+  border-radius:var(--r);overflow:visible;transition:border-color .2s,box-shadow .2s;
+  position:relative;
 }
-.audio-item.loop-active{border-color:var(--green);box-shadow:0 0 20px rgba(16,212,160,.1)}
-.audio-item.uploading{border-color:rgba(124,107,255,.4)}
+.audio-item.loop-active{border-color:var(--green);box-shadow:0 0 18px rgba(0,210,168,.08)}
+.audio-item.uploading{border-color:rgba(108,92,231,.35)}
 
-.audio-main{display:flex;align-items:center;gap:8px;padding:.75rem .9rem}
+.audio-main{display:flex;align-items:center;gap:12px;padding:1.1rem 1.1rem}
 
 .a-icon{
-  width:32px;height:32px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.9rem;flex-shrink:0;
-  background:rgba(124,107,255,.1);
+  width:52px;height:52px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;
+  background:rgba(108,92,231,.1);
 }
-.audio-item.loop-active .a-icon{background:rgba(16,212,160,.12)}
+.audio-item.loop-active .a-icon{background:rgba(0,210,168,.1)}
 
-.a-info{flex:1;min-width:0}
-.a-name{font-size:.83rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.a-meta{font-size:.68rem;color:var(--muted);font-family:'Space Mono',monospace;display:flex;gap:.5rem;align-items:center;margin-top:2px}
-.a-badge{
-  font-size:.62rem;padding:1px 7px;border-radius:20px;font-weight:700;
-  background:rgba(16,212,160,.15);color:var(--green);
-}
-.a-cached{font-size:.6rem;color:var(--green);opacity:.7}
+.a-body{flex:1;min-width:0;display:flex;align-items:center;gap:10px}
+.a-info{flex:1;min-width:0;overflow:hidden}
+.a-name{font-size:1rem;font-weight:700;display:block;word-break:break-word;white-space:normal;line-height:1.3}
+.a-meta{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;display:flex;gap:.4rem;align-items:center;margin-top:4px;flex-wrap:wrap}
 
-.a-actions{display:flex;gap:4px;flex-shrink:0}
-.a-btn{
-  width:30px;height:30px;border-radius:8px;
-  border:1px solid var(--border2);background:var(--s2);
-  color:var(--text);cursor:pointer;font-size:11px;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;font-family:'DM Sans',sans-serif;
-}
-.a-btn:hover{background:var(--s3)}
-.a-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.a-btn.del{color:var(--red);border-color:rgba(255,79,106,.25)}
-.a-btn.del:hover{background:var(--red-dim)}
-.a-btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* Upload progress bar inside item */
-.a-progress{
-  height:2px;background:var(--s3);
-}
-.a-progress-fill{
-  height:100%;
-  background:linear-gradient(90deg,var(--accent),var(--green));
-  transition:width .3s ease;
+/* Responsive tweaks */
+@media(max-width:480px){
+  .audio-main{align-items:flex-start}
+  .a-body{flex-direction:column;align-items:flex-start;gap:8px}
+  .a-name{font-size:.88rem}
+  .a-actions{flex-wrap:wrap}
 }
 
-/* Loop config */
-.loop-config{
+.a-badge{font-size:.6rem;padding:1px 6px;border-radius:20px;font-weight:700;background:rgba(0,210,168,.12);color:var(--green)}
+.a-cached{font-size:.6rem;color:var(--muted)}
+
+/* Action buttons */
+.a-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+
+/* Inline name editing */
+.a-label-row{display:flex;align-items:center;gap:6px;width:100%;min-width:0}
+.a-label-edit{
+  background:none;border:none;border-bottom:1.5px solid transparent;
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;
+  padding:1px 2px;cursor:pointer;width:100%;min-width:0;outline:none;
+  transition:border-color .15s,background .15s;border-radius:4px 4px 0 0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.a-label-edit:focus{
+  border-bottom-color:var(--accent);background:rgba(108,92,231,.06);cursor:text;
+  white-space:normal;overflow:visible;text-overflow:unset;
+}
+.a-label-edit:hover:not(:focus){border-bottom-color:var(--border3);background:rgba(255,255,255,.03)}
+.a-edit-hint{font-size:.6rem;color:var(--muted2);flex-shrink:0;opacity:0;transition:opacity .15s;white-space:nowrap}
+.a-label-row:hover .a-edit-hint,.a-label-edit:focus~.a-edit-hint{opacity:1}
+
+/* Stop button per card (shown only when playing) */
+.a-stop-btn{
+  padding:.7rem .95rem;border-radius:13px;
+  border:1px solid rgba(255,71,87,.3);
+  background:var(--red-dim);color:var(--red);font-size:.88rem;font-weight:700;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;white-space:nowrap;
   display:none;
-  background:rgba(16,212,160,.04);
-  border-top:1px solid rgba(16,212,160,.15);
-  padding:.65rem .9rem;
-  font-size:.78rem;color:var(--green);
+}
+.a-stop-btn:hover{background:rgba(255,71,87,.2);border-color:rgba(255,71,87,.5)}
+
+.a-play-btn{
+  padding:.7rem 1.3rem;border-radius:13px;border:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .15s;
+  box-shadow:0 3px 12px var(--glow);white-space:nowrap;
+}
+.a-play-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px var(--glow)}
+.a-play-btn:disabled{background:var(--s3);box-shadow:none;transform:none;cursor:not-allowed;color:var(--muted)}
+
+.a-queue-btn{
+  padding:.7rem 1.1rem;border-radius:13px;border:1px solid var(--border2);
+  background:var(--s2);color:var(--text2);font-size:.9rem;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;white-space:nowrap;
+}
+.a-queue-btn:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(108,92,231,.08)}
+.a-queue-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* 3-dot menu */
+.a-more-btn{
+  width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+  position:relative;
+}
+.a-more-btn:hover{background:var(--s2);border-color:var(--border2);color:var(--text)}
+
+/* Dropdown menu */
+.a-dropdown{
+  position:absolute;right:0;top:calc(100% + 4px);z-index:50;
+  background:var(--s2);border:1px solid var(--border3);
+  border-radius:12px;padding:.35rem;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+  opacity:0;visibility:hidden;transform:translateY(-6px) scale(.95);
+  transition:all .15s cubic-bezier(.34,1.56,.64,1);
+  min-width:160px;
+}
+.a-dropdown.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+
+.dd-item{
+  display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;
+  border-radius:8px;font-size:.8rem;cursor:pointer;transition:background .1s;
+  font-weight:500;color:var(--text2);
+}
+.dd-item:hover{background:var(--s3);color:var(--text)}
+.dd-item.loop-on{color:var(--green)}
+.dd-item.loop-on:hover{background:var(--green-dim)}
+.dd-item.danger{color:var(--red)}
+.dd-item.danger:hover{background:var(--red-dim)}
+.dd-icon{font-size:.85rem;width:16px;text-align:center;flex-shrink:0}
+.dd-divider{height:1px;background:var(--border);margin:.25rem .2rem}
+
+/* Loop config inline */
+.loop-config{
+  display:none;background:rgba(0,210,168,.04);border-top:1px solid rgba(0,210,168,.12);
+  padding:.6rem .85rem;font-size:.75rem;color:var(--green);
   align-items:center;gap:8px;flex-wrap:wrap;
 }
 .loop-config.show{display:flex}
 .loop-config input[type=number]{
-  width:64px;padding:4px 8px;
-  background:var(--s2);border:1px solid rgba(16,212,160,.35);
-  border-radius:7px;font-size:.8rem;color:var(--green);
-  font-family:'Space Mono',monospace;outline:none;
+  width:60px;padding:4px 7px;background:var(--s2);
+  border:1px solid rgba(0,210,168,.3);border-radius:7px;
+  font-size:.78rem;color:var(--green);font-family:'JetBrains Mono',monospace;outline:none;
 }
 .loop-btn{
-  padding:4px 12px;border:none;border-radius:7px;
-  cursor:pointer;font-size:.76rem;
-  font-family:'DM Sans',sans-serif;font-weight:600;
+  padding:4px 11px;border:none;border-radius:7px;
+  cursor:pointer;font-size:.73rem;font-family:'Outfit',sans-serif;font-weight:600;
 }
-.loop-btn.start{background:var(--green);color:#080810}
+.loop-btn.start{background:var(--green);color:#07070f}
 .loop-btn.stop{background:var(--red);color:#fff}
+
+/* Progress bar while uploading */
+.a-progress{height:2px;background:var(--s3)}
+.a-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:99px;animation:pbar 1.5s ease-in-out infinite alternate}
+@keyframes pbar{0%{width:30%}100%{width:90%}}
 
 /* Buttons */
 .btn-primary{
-  width:100%;padding:.8rem;
-  background:linear-gradient(135deg,var(--accent),#6b5ae0);
+  flex:1;padding:.75rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
   color:#fff;border:none;border-radius:12px;
-  font-size:.95rem;font-weight:600;cursor:pointer;
-  font-family:'DM Sans',sans-serif;
-  transition:all .2s;box-shadow:0 4px 20px var(--glow);
+  font-size:.9rem;font-weight:700;cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .2s;
+  box-shadow:0 4px 18px var(--glow);
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 28px var(--glow)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 26px var(--glow)}
 .btn-primary:disabled{background:var(--s3);box-shadow:none;transform:none;cursor:not-allowed;color:var(--muted)}
 
-.btn-outline{
-  padding:.55rem 1.2rem;background:transparent;
+.btn-ghost{
+  padding:.75rem 1.1rem;background:transparent;
   border:1px solid var(--border2);color:var(--muted);
-  border-radius:10px;font-size:.82rem;cursor:pointer;
-  font-family:'DM Sans',sans-serif;transition:all .15s;
+  border-radius:12px;font-size:.88rem;cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .15s;
 }
-.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
-.btn-outline.danger{border-color:rgba(255,79,106,.3);color:var(--red)}
-.btn-outline.danger:hover{background:var(--red-dim)}
+.btn-ghost:hover{border-color:var(--muted2);color:var(--text)}
 
 /* Sync indicator */
 #sync-indicator{
-  display:none;
   position:fixed;bottom:1.2rem;right:1.2rem;z-index:100;
   background:var(--s2);border:1px solid var(--border2);
-  border-radius:99px;padding:.45rem .9rem;
-  font-size:.75rem;color:var(--muted);
+  border-radius:99px;padding:.4rem .85rem;
+  font-size:.72rem;color:var(--muted);
   display:flex;align-items:center;gap:6px;
-  box-shadow:0 4px 20px rgba(0,0,0,.4);
-  opacity:0;transform:translateY(10px);
-  transition:all .3s;pointer-events:none;
+  box-shadow:0 4px 18px rgba(0,0,0,.4);
+  opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;
 }
 #sync-indicator.show{opacity:1;transform:translateY(0)}
-#sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
-#sync-dot.busy{background:var(--yellow);animation:spin .8s linear infinite}
-@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+#sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+#sync-dot.busy{background:var(--yellow);animation:cspin .8s linear infinite}
 
-::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
 </style>
@@ -547,52 +612,70 @@ body::before{
 
 <!-- ─── SPLASH ─── -->
 <div id="splash">
-  <div class="splash-logo">🎙️</div>
+  <div class="splash-icon">🎙️</div>
   <div>
-    <div class="splash-title">Asesorías UTPL</div>
-    <div class="splash-sub">Sistema de audio virtual</div>
+    <div class="splash-label">Sistema de Audio</div>
+    <div class="splash-sub">Panel de Anfitrión</div>
   </div>
-  <div class="splash-bar-track"><div class="splash-bar-fill"></div></div>
+  <div class="splash-track"><div class="splash-fill"></div></div>
+</div>
+
+<!-- ─── MODAL: CREAR PERFIL ─── -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">✨ Nuevo perfil</div>
+      <button class="modal-close" onclick="hideModal()">✕</button>
+    </div>
+    <label class="form-label">Tu nombre</label>
+    <input class="form-input" type="text" id="new-name" placeholder="Nombre completo" maxlength="30" onkeydown="if(event.key==='Enter')createProfile()">
+    <label class="form-label">Elige un ícono</label>
+    <div class="icon-picker" id="icon-picker"></div>
+    <div class="modal-footer">
+      <button class="btn-primary" onclick="createProfile()">Crear perfil</button>
+      <button class="btn-ghost" onclick="hideModal()">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ─── PROFILE SCREEN ─── -->
 <div id="profile-screen">
-  <div class="profile-header">
-    <div class="ps-logo">🎙️</div>
-    <h1>Asesorías UTPL</h1>
-    <p>¿Quién está en turno hoy?</p>
+  <!-- Top bar: brand + QR -->
+  <div class="page-top">
+    <div class="page-brand">
+      <div class="brand-icon">🎙️</div>
+      <div>
+        <div class="brand-text">Panel de Anfitrión</div>
+        <div class="brand-sub">Asesorías Virtuales</div>
+      </div>
+    </div>
+    <div class="qr-inline" onclick="showQRModal()" title="Ver QR de acceso al Control">
+      <div class="qr-inline-canvas" id="qr-canvas"></div>
+      <div class="qr-label"><strong>Acceso Móvil</strong>Escanea para abrir en celular</div>
+    </div>
   </div>
 
-  <div class="storage-banner" id="global-storage-bar">
-    <div class="sb-row">
-      <span class="sb-label">📦 Firebase almacenamiento</span>
-      <span class="sb-val" id="global-storage-text">Calculando…</span>
+  <!-- Storage global compacto -->
+  <div class="storage-compact" id="global-storage-bar">
+    <div class="sc-top">
+      <span class="sc-label">📦 Almacenamiento</span>
+      <span class="sc-val" id="global-storage-text">Calculando…</span>
     </div>
-    <div class="sb-track" id="global-track"></div>
-    <div class="sb-legend" id="global-legend"></div>
+    <div class="sc-track" id="global-track"></div>
+    <div class="sc-legend" id="global-legend"></div>
   </div>
 
-  <!-- QR Panel -->
-  <div class="qr-panel">
-    <div id="qr-canvas"></div>
-    <div class="qr-info">
-      <h4>📱 Acceso desde celular</h4>
-      <p>Escanea para abrir el player en cualquier dispositivo</p>
-      <div class="qr-url" id="qr-url-text">—</div>
-    </div>
+  <!-- Estado del player -->
+  <div class="player-status-banner err" id="profile-player-status">
+    <span class="psb-dot"></span>
+    <span id="profile-player-status-text">Verificando estado del player…</span>
+  </div>
+
+  <div class="section-head">
+    <div class="section-heading">¿Quién está en turno?</div>
   </div>
 
   <div class="profiles-grid" id="profiles-grid"></div>
-
-  <div id="new-profile-form">
-    <h3>✨ Crear nuevo perfil</h3>
-    <div class="icon-picker" id="icon-picker"></div>
-    <input class="form-input" type="text" id="new-name" placeholder="Tu nombre completo" maxlength="30">
-    <div class="form-row">
-      <button class="btn-primary" onclick="createProfile()" style="flex:1">Crear perfil</button>
-      <button class="btn-outline" onclick="hideNewProfileForm()">Cancelar</button>
-    </div>
-  </div>
 </div>
 
 <!-- ─── LOADING ─── -->
@@ -600,7 +683,7 @@ body::before{
   <div class="ls-avatar" id="ls-avatar">🎤</div>
   <div class="ls-name" id="ls-name">Cargando…</div>
   <div class="ls-sub" id="ls-sub">Sincronizando audios…</div>
-  <div class="ls-bar-track"><div class="ls-bar-fill" id="ls-bar"></div></div>
+  <div class="ls-track"><div class="ls-fill" id="ls-bar"></div></div>
 </div>
 
 <!-- ─── MAIN SCREEN ─── -->
@@ -609,41 +692,67 @@ body::before{
     <div class="h-avatar" id="host-avatar">🎤</div>
     <div>
       <div class="h-name" id="header-name">—</div>
-      <div class="h-role">anfitrión/a activo/a</div>
+      <div class="h-role">asesora/anfitrión activo</div>
     </div>
     <button class="back-btn" onclick="goBackToProfiles()">↩ Perfiles</button>
   </div>
 
-  <div class="storage-widget">
-    <div class="sw-row">
-      <span class="sw-label">Tu almacenamiento</span>
-      <span class="sw-val" id="my-storage-text">0 KB / 10 MB</span>
+  <div class="storage-mini">
+    <div class="sm-row">
+      <span class="sm-label">Tu almacenamiento</span>
+      <span class="sm-val" id="my-storage-text">0 KB / 10 MB</span>
     </div>
-    <div class="sw-track"><div class="sw-fill ok" id="my-storage-fill" style="width:0%"></div></div>
-    <div class="sw-hint" id="my-storage-hint">Cargando…</div>
+    <div class="sm-track"><div class="sm-fill ok" id="my-storage-fill" style="width:0%"></div></div>
+    <div class="sm-hint" id="my-storage-hint">Cargando…</div>
   </div>
 
-  <div id="blocked-banner">⚠️ <span id="blocked-by"></span></div>
+  <!-- Estado del player en main -->
+  <div class="player-status-banner err" id="main-player-status" style="display:none">
+    <span class="psb-dot"></span>
+    <span id="main-player-status-text"></span>
+  </div>
 
-  <div id="now-playing-card">
-    <div class="np-label">reproduciendo ahora</div>
-    <div class="np-title" id="np-title">—</div>
-    <div class="np-controls">
-      <button class="ctrl-btn" id="pause-btn" onclick="sendCmd('pause')">⏸ Pausar</button>
-      <button class="ctrl-btn" id="resume-btn" onclick="sendCmd('resume')" style="display:none">▶ Reanudar</button>
-      <button class="ctrl-btn danger" onclick="sendCmd('stop')">⏹ Detener</button>
+  <!-- Bloqueo por otra asesora -->
+  <div id="blocked-banner">
+    <span>⚠️</span><span id="blocked-by"></span>
+  </div>
+
+  <!-- Barra de reproducción activa (discreta) -->
+  <div id="now-playing-bar">
+    <div class="np-bar-row">
+      <div class="np-wave-mini">
+        <div class="np-wave-bar" style="height:8px"></div>
+        <div class="np-wave-bar" style="height:14px"></div>
+        <div class="np-wave-bar" style="height:5px"></div>
+      </div>
+      <div class="np-bar-info">
+        <div class="np-bar-title" id="np-title">—</div>
+        <div class="np-bar-host" id="np-host">—</div>
+      </div>
+      <div class="np-bar-controls">
+        <button class="np-ctrl" id="pause-btn" onclick="sendCmd('pause')">⏸</button>
+        <button class="np-ctrl" id="resume-btn" onclick="sendCmd('resume')" style="display:none">▶</button>
+        <button class="np-ctrl stop" onclick="sendCmd('stop')">■ Detener</button>
+      </div>
     </div>
   </div>
 
   <div class="section-title">tus audios</div>
-  <div id="compress-status"></div>
+
+  <div id="audio-list"></div>
+
+  <!-- Compress status (con cierre) -->
+  <div id="compress-status">
+    <div class="cs-spin"></div>
+    <span id="compress-text">Comprimiendo audio…</span>
+  </div>
+
   <div id="drop-zone" onclick="document.getElementById('file-input').click()">
     <span class="dz-icon">🎵</span>
     Toca para subir audios
     <div class="dz-hint">.mp3 · .wav · .ogg · .m4a — máx 10 MB total</div>
   </div>
   <input type="file" id="file-input" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,.opus" multiple>
-  <div id="audio-list"></div>
 </div>
 
 <!-- Sync indicator -->
@@ -654,7 +763,7 @@ body::before{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, get, remove }
+import { getDatabase, ref, onValue, set, get, remove, update }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FC = {
@@ -670,43 +779,72 @@ const FC = {
 const app = initializeApp(FC);
 const db = getDatabase(app);
 
-const FIREBASE_LIMIT_MB = 100; // Realtime DB free = 1GB, we track per-profile
+const FIREBASE_LIMIT_MB = 100;
 const PER_PROFILE_LIMIT_MB = 10;
 const ICONS = ['🎤','🎵','🎧','🎙️','📢','🔊','🎶','🌟','🦋','🌸','🦄','🌈','⚡','🔥','💫','🎯','🚀','🎭','🌺','🦁'];
 const PALETTE = ['#7c6bff','#ff6584','#10d4a0','#f5a623','#58a6ff','#ff7675','#a78bfa','#fd79a8','#00b894','#fdcb6e'];
 
 let profiles = [];
 let currentProfile = null;
-let audios = []; // { name, mime, size, loopInterval, cached }
+let audios = [];
 let systemPlaying = false;
 let systemHost = null;
+let systemCurrentHost = null;
 let activeLoopName = null;
+let openDropdownIdx = null;
 
 // ── ICON PICKER ────────────────────────────────────────
 let selectedIcon = ICONS[0];
 const picker = document.getElementById('icon-picker');
-ICONS.forEach(ic => {
-  const el = document.createElement('div');
-  el.className = 'icon-opt' + (ic === selectedIcon ? ' sel' : '');
-  el.textContent = ic;
-  el.style.background = PALETTE[ICONS.indexOf(ic) % PALETTE.length] + '18';
-  el.onclick = () => {
-    document.querySelectorAll('.icon-opt').forEach(x => x.classList.remove('sel'));
-    el.classList.add('sel');
-    selectedIcon = ic;
-  };
-  picker.appendChild(el);
+
+function renderIconPicker() {
+  picker.innerHTML = '';
+  const usedIcons = profiles.map(p => p.icon);
+  ICONS.forEach(ic => {
+    const el = document.createElement('div');
+    const isUsed = usedIcons.includes(ic) && ic !== selectedIcon;
+    el.className = 'icon-opt' + (ic === selectedIcon ? ' sel' : '') + (isUsed ? ' used' : '');
+    el.textContent = ic;
+    el.style.background = PALETTE[ICONS.indexOf(ic) % PALETTE.length] + '20';
+    if (isUsed) {
+      el.style.opacity = '0.3';
+      el.title = 'Ya está en uso';
+    }
+    el.onclick = () => {
+      document.querySelectorAll('.icon-opt').forEach(x => x.classList.remove('sel'));
+      el.classList.add('sel');
+      selectedIcon = ic;
+    };
+    picker.appendChild(el);
+  });
+}
+renderIconPicker();
+
+// ── MODAL ──────────────────────────────────────────────
+window.showModal = () => {
+  renderIconPicker();
+  document.getElementById('profile-modal').classList.add('open');
+  setTimeout(() => document.getElementById('new-name').focus(), 200);
+};
+window.hideModal = () => {
+  document.getElementById('profile-modal').classList.remove('open');
+  document.getElementById('new-name').value = '';
+};
+document.getElementById('profile-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('profile-modal')) hideModal();
 });
 
 // ── QR CODE ─────────────────────────────────────────────
 function renderQR() {
-  const playerURL = window.location.href.replace('control.html', 'player.html');
-  document.getElementById('qr-url-text').textContent = playerURL;
+  // QR points to control.html (for mobile access to control panel)
+  const controlURL = window.location.href;
+  document.getElementById('qr-url-text') && (document.getElementById('qr-url-text').textContent = controlURL);
   try {
+    document.getElementById('qr-canvas').innerHTML = '';
     new QRCode(document.getElementById('qr-canvas'), {
-      text: playerURL,
-      width: 72, height: 72,
-      colorDark: '#0a0a10',
+      text: controlURL,
+      width: 46, height: 46,
+      colorDark: '#07070f',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M
     });
@@ -716,29 +854,83 @@ function renderQR() {
 }
 renderQR();
 
-// ── PROFILES (Firebase-synced) ─────────────────────────
+window.showQRModal = () => {
+  // Show full URL in a quick modal (could expand later)
+  const url = window.location.href;
+  alert('URL de acceso:\n' + url);
+};
+
+// ── PLAYER STATUS MONITOR ──────────────────────────────
+// Listen to Firebase .info/connected and a player heartbeat
+let playerOk = false;
+let playerActivated = false;
+
+function updatePlayerStatusBanners(ok, activated, msg) {
+  const banners = [
+    { el: document.getElementById('profile-player-status'), txt: document.getElementById('profile-player-status-text') },
+    { el: document.getElementById('main-player-status'), txt: document.getElementById('main-player-status-text') }
+  ];
+  banners.forEach(({ el, txt }) => {
+    if (!el) return;
+    if (document.getElementById('main-screen').style.display !== 'none' && el.id === 'main-player-status') {
+      el.style.display = ok && activated ? 'none' : 'flex';
+    }
+    el.className = 'player-status-banner ' + (ok && activated ? 'ok' : 'err');
+    if (txt) txt.textContent = msg;
+  });
+}
+
+// Monitor player heartbeat via Firebase
+onValue(ref(db, 'playerStatus'), snap => {
+  const ps = snap.val() || {};
+  const now = Date.now();
+  const lastSeen = ps.lastSeen || 0;
+  const active = ps.activated || false;
+  playerOk = (now - lastSeen) < 30000; // 30s threshold
+  playerActivated = active;
+
+  let msg, cls;
+  if (!playerOk) {
+    msg = '⚠️ Player no detectado — abre player.html en la pantalla principal';
+    cls = 'err';
+  } else if (!playerActivated) {
+    msg = '⚠️ Player abierto pero no activado — presiona el botón "Activar audio" en el player';
+    cls = 'warn';
+  } else {
+    msg = '✓ Player activo y listo';
+    cls = 'ok';
+  }
+
+  const banners = [
+    document.getElementById('profile-player-status'),
+    document.getElementById('main-player-status')
+  ];
+  banners.forEach(el => {
+    if (!el) return;
+    el.className = 'player-status-banner ' + cls;
+    const txtEl = el.querySelector('span:last-child');
+    if (txtEl) txtEl.textContent = msg;
+    if (el.id === 'main-player-status') {
+      el.style.display = (cls === 'ok') ? 'none' : 'flex';
+    }
+  });
+});
+
+// ── PROFILES ──────────────────────────────────────────
 async function loadProfiles() {
-  // Show loading hint in grid while fetching from Firebase
   const grid = document.getElementById('profiles-grid');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;padding:1.5rem">⏳ Cargando perfiles…</div>';
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;padding:1.5rem">Cargando perfiles…</div>';
   try {
     const snap = await get(ref(db, 'profiles'));
     const val = snap.val();
     if (val && typeof val === 'object') {
       profiles = Object.values(val);
     } else {
-      // Migrate from localStorage if Firebase is empty
       const local = JSON.parse(localStorage.getItem('utpl_profiles') || '[]');
-      if (local.length) {
-        profiles = local;
-        await saveProfiles(); // push to Firebase
-        localStorage.removeItem('utpl_profiles'); // cleanup
-      } else {
-        profiles = [];
-      }
+      if (local.length) { profiles = local; await saveProfiles(); localStorage.removeItem('utpl_profiles'); }
+      else profiles = [];
     }
   } catch(e) {
-    console.warn('loadProfiles Firebase error, falling back to localStorage', e);
     try { profiles = JSON.parse(localStorage.getItem('utpl_profiles') || '[]'); }
     catch { profiles = []; }
   }
@@ -746,62 +938,112 @@ async function loadProfiles() {
 }
 
 async function saveProfiles() {
-  // Store as object keyed by profile id
   const obj = {};
   profiles.forEach(p => { obj[p.id] = p; });
-  try {
-    await set(ref(db, 'profiles'), obj);
-  } catch(e) {
-    console.warn('saveProfiles Firebase error, falling back to localStorage', e);
-    localStorage.setItem('utpl_profiles', JSON.stringify(profiles));
+  try { await set(ref(db, 'profiles'), obj); }
+  catch(e) { localStorage.setItem('utpl_profiles', JSON.stringify(profiles)); }
+}
+
+// Track who is actively using the system (in profile screen, by lastActive recency)
+let activeUsers = {};
+onValue(ref(db, 'activeUsers'), snap => {
+  activeUsers = snap.val() || {};
+  // Re-render only if on profile screen
+  if (document.getElementById('profile-screen').style.display !== 'none') {
+    renderProfiles();
   }
+});
+
+// Announce ourselves when we enter a profile
+function announceActive(profileId) {
+  if (!profileId) return;
+  try {
+    set(ref(db, `activeUsers/${profileId}`), { ts: Date.now() });
+  } catch(e) {}
+}
+
+function clearActive(profileId) {
+  if (!profileId) return;
+  try { remove(ref(db, `activeUsers/${profileId}`)); } catch(e) {}
 }
 
 function renderProfiles() {
   const grid = document.getElementById('profiles-grid');
   grid.innerHTML = '';
   const lastId = localStorage.getItem('utpl_last_profile');
-
-  // Sort by lastActive desc so most recent appears first
+  const now = Date.now();
   const sorted = [...profiles].sort((a,b) => (b.lastActive||0)-(a.lastActive||0));
 
   sorted.forEach(p => {
+    const isLast = p.id === lastId;
+    const userActive = activeUsers[p.id] && (now - (activeUsers[p.id].ts || 0)) < 60000;
+    const isBusy = userActive && systemCurrentHost === p.name;
+
     const card = document.createElement('div');
-    card.className = 'profile-card' + (p.id === lastId ? ' last-used' : '');
-    card.innerHTML = `
-      <button class="pc-delete" title="Eliminar perfil" onclick="deleteProfile(event,'${p.id}')">✕</button>
-      <div class="pc-avatar" style="background:${p.color}18">
-        ${p.icon}
-        <div class="pc-online ${p.id === lastId ? 'on' : 'off'}"></div>
-      </div>
-      <div class="pc-name">${p.name}</div>
-      <div class="pc-size">${formatBytes(p.totalSize || 0)}</div>
-    `;
+    card.className = 'profile-card' + (isLast ? ' last-used' : '');
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'pc-delete';
+    delBtn.title = 'Eliminar perfil';
+    delBtn.textContent = '✕';
+    delBtn.onclick = (e) => deleteProfile(e, p.id);
+
+    const avatar = document.createElement('div');
+    avatar.className = 'pc-avatar';
+    avatar.style.background = p.color + '18';
+
+    const iconSpan = document.createElement('span');
+    iconSpan.textContent = p.icon;
+    avatar.appendChild(iconSpan);
+
+    const presence = document.createElement('div');
+    presence.className = 'pc-presence ' + (isBusy ? 'busy' : userActive ? 'on' : 'off');
+    avatar.appendChild(presence);
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'pc-name';
+    nameEl.textContent = p.name;
+
+    const sizeEl = document.createElement('div');
+    sizeEl.className = 'pc-size';
+    sizeEl.textContent = formatBytes(p.totalSize || 0);
+
+    card.appendChild(delBtn);
+    card.appendChild(avatar);
+    card.appendChild(nameEl);
+    card.appendChild(sizeEl);
+
+    if (isBusy) {
+      const tag = document.createElement('div');
+      tag.className = 'pc-using-tag';
+      tag.textContent = 'Reproduciendo';
+      card.appendChild(tag);
+    } else if (userActive) {
+      const tag = document.createElement('div');
+      tag.className = 'pc-using-tag';
+      tag.style.background = 'rgba(108,92,231,.1)';
+      tag.style.color = 'var(--accent2)';
+      tag.style.borderColor = 'rgba(108,92,231,.2)';
+      tag.textContent = 'Activa ahora';
+      card.appendChild(tag);
+    }
+
     card.onclick = () => selectProfile(p.id);
     grid.appendChild(card);
   });
 
   const addCard = document.createElement('div');
   addCard.className = 'pc-add';
-  addCard.innerHTML = `<div class="pc-add-icon">＋</div><span>Nuevo perfil</span>`;
-  addCard.onclick = showNewProfileForm;
+  addCard.innerHTML = `<div class="pc-add-icon">＋</div><span>Nueva asesora</span>`;
+  addCard.onclick = showModal;
   grid.appendChild(addCard);
 
   updateGlobalStorage();
 }
 
-window.showNewProfileForm = () => {
-  document.getElementById('new-profile-form').style.display = 'block';
-  document.getElementById('new-name').focus();
-};
-window.hideNewProfileForm = () => {
-  document.getElementById('new-profile-form').style.display = 'none';
-  document.getElementById('new-name').value = '';
-};
-
 window.createProfile = async () => {
   const name = document.getElementById('new-name').value.trim();
-  if (!name) return;
+  if (!name) { document.getElementById('new-name').focus(); return; }
   const profile = {
     id: crypto.randomUUID(),
     name, icon: selectedIcon,
@@ -810,7 +1052,7 @@ window.createProfile = async () => {
   };
   profiles.push(profile);
   await saveProfiles();
-  hideNewProfileForm();
+  hideModal();
   renderProfiles();
 };
 
@@ -831,6 +1073,7 @@ function selectProfile(id) {
   if (!p) return;
   currentProfile = p;
   localStorage.setItem('utpl_last_profile', id);
+  announceActive(id);
   showLoading(p);
 }
 
@@ -841,16 +1084,10 @@ function showLoading(profile) {
   document.getElementById('ls-name').textContent = profile.name;
   document.getElementById('ls-sub').textContent = 'Cargando audios…';
   ls.style.display = 'flex';
-
-  // Re-trigger animation
   const bar = document.getElementById('ls-bar');
   bar.style.animation = 'none'; bar.offsetHeight;
-  bar.style.animation = 'lsLoad 1.3s ease forwards';
-
-  setTimeout(() => {
-    ls.style.display = 'none';
-    enterMain(profile);
-  }, 1300);
+  bar.style.animation = 'sload 1.3s ease forwards';
+  setTimeout(() => { ls.style.display = 'none'; enterMain(profile); }, 1300);
 }
 
 function enterMain(profile) {
@@ -860,17 +1097,22 @@ function enterMain(profile) {
   document.getElementById('header-name').textContent = profile.name;
   document.getElementById('profile-screen').style.display = 'none';
   document.getElementById('main-screen').style.display = 'block';
+  // Show player status in main if not ok
+  const mpStatus = document.getElementById('main-player-status');
+  if (mpStatus) mpStatus.style.display = (!playerOk || !playerActivated) ? 'flex' : 'none';
   renderList();
-  updateMyStorage();
+  updateMyStorageDisplay();
   checkCachedAudios();
 }
 
 window.goBackToProfiles = () => {
+  if (currentProfile) clearActive(currentProfile.id);
   saveCurrentProfile();
   document.getElementById('main-screen').style.display = 'none';
   document.getElementById('profile-screen').style.display = 'block';
   currentProfile = null;
   activeLoopName = null;
+  closeAnyDropdown();
 };
 
 async function saveCurrentProfile() {
@@ -883,27 +1125,23 @@ async function saveCurrentProfile() {
   await saveProfiles();
 }
 
-// ── AUTO-RESTORE ──────────────────────────────────────
 function autoRestore() {
   const lastId = localStorage.getItem('utpl_last_profile');
   if (!lastId) return;
   const p = profiles.find(x => x.id === lastId);
   if (p) setTimeout(() => selectProfile(p.id), 100);
+  else localStorage.removeItem('utpl_last_profile');
 }
 
-// ── REAL-TIME PROFILE SYNC ────────────────────────────
-// Listen for profile changes made on other devices
 let profileSyncActive = false;
 function startProfileSync() {
   if (profileSyncActive) return;
   profileSyncActive = true;
-  onValue(ref(db, 'profiles'), (snap) => {
-    // Skip if we're currently inside a profile (avoid interrupting work)
+  onValue(ref(db, 'profiles'), snap => {
     if (currentProfile) return;
     const val = snap.val();
     if (val && typeof val === 'object') {
       const remoteProfiles = Object.values(val);
-      // Only update if data actually changed (compare by count + ids)
       const localIds = profiles.map(p=>p.id).sort().join();
       const remoteIds = remoteProfiles.map(p=>p.id).sort().join();
       if (localIds !== remoteIds || JSON.stringify(profiles) !== JSON.stringify(remoteProfiles)) {
@@ -914,7 +1152,7 @@ function startProfileSync() {
   });
 }
 
-// ── STORAGE UTILS ─────────────────────────────────────
+// ── STORAGE ───────────────────────────────────────────
 function formatBytes(b) {
   if (b < 1024) return b + ' B';
   if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
@@ -924,14 +1162,12 @@ function formatBytes(b) {
 function updateGlobalStorage() {
   const totalBytes = profiles.reduce((s, p) => s + (p.totalSize || 0), 0);
   const limitBytes = FIREBASE_LIMIT_MB * 1048576;
-  document.getElementById('global-storage-text').textContent =
-    formatBytes(totalBytes) + ' / ' + FIREBASE_LIMIT_MB + ' MB';
-
+  document.getElementById('global-storage-text').textContent = formatBytes(totalBytes) + ' / ' + FIREBASE_LIMIT_MB + ' MB';
   const track = document.getElementById('global-track');
   track.innerHTML = '';
   profiles.filter(p => p.totalSize > 0).forEach(p => {
     const seg = document.createElement('div');
-    seg.className = 'sb-seg';
+    seg.className = 'sc-seg';
     seg.style.width = Math.min((p.totalSize / limitBytes) * 100, 100) + '%';
     seg.style.background = p.color;
     seg.title = p.name + ': ' + formatBytes(p.totalSize);
@@ -939,21 +1175,26 @@ function updateGlobalStorage() {
   });
   if (!track.children.length) {
     const e = document.createElement('div');
-    e.className = 'sb-seg';e.style.width='100%';e.style.background='#1e1e30';
+    e.className = 'sc-seg';e.style.width='100%';e.style.background='var(--s3)';
     track.appendChild(e);
   }
-
   const legend = document.getElementById('global-legend');
   legend.innerHTML = '';
   profiles.forEach(p => {
     const item = document.createElement('div');
-    item.className = 'sb-leg-item';
-    item.innerHTML = `<div class="sb-leg-dot" style="background:${p.color}"></div>${p.name}: ${formatBytes(p.totalSize || 0)}`;
+    item.className = 'sc-leg';
+    const dot = document.createElement('div');
+    dot.className = 'sc-dot';
+    dot.style.background = p.color;
+    const label = document.createElement('span');
+    label.textContent = p.name + ': ' + formatBytes(p.totalSize || 0);
+    item.appendChild(dot);
+    item.appendChild(label);
     legend.appendChild(item);
   });
 }
 
-function updateMyStorage() {
+function updateMyStorageDisplay() {
   if (!currentProfile) return;
   const totalBytes = audios.reduce((s, a) => s + (a.size || 0), 0);
   const limitBytes = PER_PROFILE_LIMIT_MB * 1048576;
@@ -961,12 +1202,12 @@ function updateMyStorage() {
   document.getElementById('my-storage-text').textContent = formatBytes(totalBytes) + ' / ' + PER_PROFILE_LIMIT_MB + ' MB';
   const fill = document.getElementById('my-storage-fill');
   fill.style.width = pct + '%';
-  fill.className = 'sw-fill ' + (pct >= 90 ? 'danger' : pct >= 75 ? 'warn' : 'ok');
+  fill.className = 'sm-fill ' + (pct >= 90 ? 'danger' : pct >= 75 ? 'warn' : 'ok');
   const hint = document.getElementById('my-storage-hint');
   if (pct >= 90) hint.textContent = '⚠️ Casi lleno — elimina audios para liberar espacio';
   else if (pct >= 75) hint.textContent = '⚡ Cerca del límite';
   else hint.textContent = audios.length + ' audio' + (audios.length !== 1 ? 's' : '') + ' guardado' + (audios.length !== 1 ? 's' : '');
-  if (currentProfile) { currentProfile.totalSize = totalBytes; saveCurrentProfile(); updateGlobalStorage(); }
+  if (currentProfile) { currentProfile.totalSize = totalBytes; updateGlobalStorage(); }
 }
 
 // ── SYNC INDICATOR ────────────────────────────────────
@@ -978,16 +1219,10 @@ function showSync(busy, text = '') {
   dot.className = busy ? 'busy' : '';
   txt.textContent = busy ? text || 'Subiendo…' : '✓ Sincronizado';
   el.classList.add('show');
-  if (!busy) {
-    clearTimeout(syncTimer);
-    syncTimer = setTimeout(() => el.classList.remove('show'), 2500);
-  }
+  if (!busy) { clearTimeout(syncTimer); syncTimer = setTimeout(() => el.classList.remove('show'), 2500); }
 }
 
 // ── FIREBASE AUDIO SYNC ───────────────────────────────
-// Architecture: audio binaries live in /audio/{profileId}/{name}
-// Commands are lightweight (no binary data)
-
 async function uploadAudioToFirebase(profileId, name, data, mime) {
   showSync(true, 'Subiendo audio…');
   await set(ref(db, `audio/${profileId}/${encodeKey(name)}`), { data, mime, ts: Date.now() });
@@ -998,271 +1233,187 @@ async function deleteAudioFromFirebase(profileId, name) {
   await remove(ref(db, `audio/${profileId}/${encodeKey(name)}`));
 }
 
-function encodeKey(name) {
-  // Firebase keys can't have . / # $ [ ]
-  return name.replace(/[.#$[\]/]/g, '_');
-}
+function encodeKey(name) { return name.replace(/[.#$[\]/]/g, '_'); }
 
-// Check which audios are already cached in Firebase
 async function checkCachedAudios() {
   if (!currentProfile) return;
   try {
     const snap = await get(ref(db, `audio/${currentProfile.id}`));
     const cached = snap.val() || {};
     let changed = false;
-    audios.forEach(a => {
-      const key = encodeKey(a.name);
-      if (cached[key]) { a.cached = true; changed = true; }
-    });
+    audios.forEach(a => { const key = encodeKey(a.name); if (cached[key]) { a.cached = true; changed = true; } });
     if (changed) { saveCurrentProfile(); renderList(); }
-  } catch(e) { console.warn('Cache check failed', e); }
+  } catch(e) {}
 }
 
-// ── AUDIO COMPRESSION (Web Audio API → WebM Opus) ────
-async function compressAudio(file) {
-  const statusEl = document.getElementById('compress-status');
-  statusEl.style.display = 'block';
-  statusEl.textContent = `⚙️ Comprimiendo "${file.name}"…`;
+// ── DROPDOWN MANAGEMENT ───────────────────────────────
+function closeAnyDropdown() {
+  document.querySelectorAll('.a-dropdown.open').forEach(d => d.classList.remove('open'));
+  openDropdownIdx = null;
+}
 
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-    await audioCtx.close();
-
-    // Downsample to mono 22050 Hz
-    const targetSampleRate = 22050;
-    const offlineCtx = new OfflineAudioContext(1, Math.ceil(decoded.duration * targetSampleRate), targetSampleRate);
-    const src = offlineCtx.createBufferSource();
-    src.buffer = decoded;
-    src.connect(offlineCtx.destination);
-    src.start(0);
-    const rendered = await offlineCtx.startRendering();
-
-    // Encode via MediaRecorder if supported
-    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-      statusEl.style.display = 'none';
-      return null; // Fallback to original
-    }
-
-    // Convert AudioBuffer to WAV blob to feed MediaRecorder
-    const wavBlob = audioBufferToWavBlob(rendered);
-    const wavUrl = URL.createObjectURL(wavBlob);
-
-    return new Promise((resolve) => {
-      const audio = new Audio(wavUrl);
-      const stream = audio.captureStream ? audio.captureStream() : audio.mozCaptureStream ? audio.mozCaptureStream() : null;
-
-      if (!stream) { statusEl.style.display = 'none'; resolve(null); return; }
-
-      const recorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus',
-        audioBitsPerSecond: 32000
-      });
-
-      const chunks = [];
-      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        URL.revokeObjectURL(wavUrl);
-        const compressed = new Blob(chunks, { type: 'audio/webm' });
-        statusEl.style.display = 'none';
-        resolve(compressed);
-      };
-
-      recorder.start();
-      audio.play();
-      audio.onended = () => recorder.stop();
-      // Timeout fallback
-      setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, (decoded.duration + 2) * 1000);
-    });
-
-  } catch(e) {
-    console.warn('Compression failed:', e);
-    statusEl.style.display = 'none';
-    return null;
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.a-more-btn') && !e.target.closest('.a-dropdown')) {
+    closeAnyDropdown();
   }
-}
-
-function audioBufferToWavBlob(buffer) {
-  const numCh = buffer.numberOfChannels;
-  const numSamples = buffer.length;
-  const sampleRate = buffer.sampleRate;
-  const bytesPerSample = 2;
-  const blockAlign = numCh * bytesPerSample;
-  const byteRate = sampleRate * blockAlign;
-  const dataSize = numSamples * blockAlign;
-  const ab = new ArrayBuffer(44 + dataSize);
-  const dv = new DataView(ab);
-
-  const writeStr = (offset, str) => { for(let i=0;i<str.length;i++) dv.setUint8(offset+i, str.charCodeAt(i)); };
-  writeStr(0,'RIFF'); dv.setUint32(4, 36 + dataSize, true);
-  writeStr(8,'WAVE'); writeStr(12,'fmt ');
-  dv.setUint32(16,16,true); dv.setUint16(20,1,true);
-  dv.setUint16(22,numCh,true); dv.setUint32(24,sampleRate,true);
-  dv.setUint32(28,byteRate,true); dv.setUint16(32,blockAlign,true);
-  dv.setUint16(34,bytesPerSample*8,true); writeStr(36,'data');
-  dv.setUint32(40,dataSize,true);
-
-  let offset = 44;
-  const ch = buffer.getChannelData(0);
-  for(let i=0;i<numSamples;i++) {
-    const s = Math.max(-1,Math.min(1,ch[i]));
-    dv.setInt16(offset, s < 0 ? s*0x8000 : s*0x7FFF, true);
-    offset += 2;
-  }
-  return new Blob([ab], { type:'audio/wav' });
-}
-
-// ── FILE UPLOAD HANDLER ────────────────────────────────
-const fileInput = document.getElementById('file-input');
-fileInput.onchange = e => handleFiles(e.target.files);
-
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('dragover');
-  handleFiles(e.dataTransfer.files);
 });
-
-async function handleFiles(files) {
-  const AUDIO_EXTS = /\.(mp3|wav|ogg|m4a|aac|flac|opus|webm|wma)$/i;
-  for (const file of Array.from(files)) {
-    // Accept by MIME type OR by extension (iOS/Android sometimes sends empty/wrong MIME)
-    const validMime = file.type.startsWith('audio/');
-    const validExt  = AUDIO_EXTS.test(file.name);
-    if (!validMime && !validExt) continue;
-    // Ensure we have a sane mime type even if browser didn't set one
-    const EXT_MIME = {mp3:'audio/mpeg',mp4:'audio/mp4',m4a:'audio/mp4',aac:'audio/aac',
-                      ogg:'audio/ogg',wav:'audio/wav',flac:'audio/flac',opus:'audio/opus',webm:'audio/webm'};
-    const ext = file.name.split('.').pop().toLowerCase();
-    const resolvedMime = (file.type && file.type.startsWith('audio/')) ? file.type : (EXT_MIME[ext] || 'audio/mpeg');
-
-    const totalBytes = audios.reduce((s, a) => s + (a.size || 0), 0);
-    if (totalBytes + file.size > PER_PROFILE_LIMIT_MB * 1048576) {
-      alert('⚠️ Límite de ' + PER_PROFILE_LIMIT_MB + ' MB alcanzado. Elimina audios para agregar más.');
-      continue;
-    }
-
-    // Add placeholder
-    const placeholder = { name: file.name, mime: resolvedMime, size: file.size, loopInterval: 120, cached: false, uploading: true };
-    audios.push(placeholder);
-    saveCurrentProfile();
-    renderList();
-    updateMyStorage();
-
-    // Try compression
-    let finalBlob = null;
-    let finalMime = resolvedMime;
-    try {
-      const compressed = await compressAudio(file);
-      if (compressed && compressed.size < file.size * 0.85) {
-        finalBlob = compressed;
-        finalMime = 'audio/webm';
-      }
-    } catch(e) {}
-
-    if (!finalBlob) finalBlob = file;
-
-    // Read as base64
-    const b64 = await new Promise(res => {
-      const reader = new FileReader();
-      reader.onload = ev => res(ev.target.result.split(',')[1]);
-      reader.readAsDataURL(finalBlob);
-    });
-
-    // Upload to Firebase
-    try {
-      await uploadAudioToFirebase(currentProfile.id, file.name, b64, finalMime);
-      const idx = audios.findIndex(a => a.name === file.name);
-      if (idx !== -1) {
-        audios[idx].cached = true;
-        audios[idx].uploading = false;
-        audios[idx].compressedSize = finalBlob.size;
-      }
-    } catch(e) {
-      const idx = audios.findIndex(a => a.name === file.name);
-      if (idx !== -1) audios[idx].uploading = false;
-      alert('Error al subir "' + file.name + '": ' + e.message);
-    }
-
-    saveCurrentProfile();
-    renderList();
-    updateMyStorage();
-  }
-}
 
 // ── RENDER LIST ───────────────────────────────────────
 function renderList() {
   const list = document.getElementById('audio-list');
   list.innerHTML = '';
   if (!audios.length) {
-    list.innerHTML = '<div style="text-align:center;color:var(--muted2);padding:2rem;font-size:.82rem">Sin audios aún — sube tu primer archivo 🎵</div>';
+    list.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted2);padding:2.5rem;font-size:.9rem">Sin audios aún — sube tu primer archivo 🎵</div>';
     return;
   }
+
+  // Determine if any audio is currently playing globally
+  const isGloballyPlaying = systemPlaying;
+  const playingAudioName = document.getElementById('np-title')?.textContent?.trim();
+
   audios.forEach((a, i) => {
     const isLoop = activeLoopName === a.name;
+    // The label shown on the button (custom label or filename without extension)
+    const displayLabel = a.label || a.name.replace(/\.[^.]+$/, '');
+    const savedSize = a.compressedSize && a.compressedSize < a.size ? ` → ${formatBytes(a.compressedSize)}` : '';
+
     const item = document.createElement('div');
     item.className = 'audio-item' + (isLoop ? ' loop-active' : '') + (a.uploading ? ' uploading' : '');
 
-    const savedSize = a.compressedSize && a.compressedSize < a.size
-      ? ` → ${formatBytes(a.compressedSize)}`
-      : '';
+    // Play button: disabled if globally playing OR uploading
+    const playDisabled = a.uploading || isGloballyPlaying;
+    // Queue button: disabled only if uploading
+    const queueDisabled = a.uploading;
 
     item.innerHTML = `
       <div class="audio-main">
         <div class="a-icon">${isLoop ? '🔁' : '🎵'}</div>
-        <div class="a-info">
-          <span class="a-name" title="${a.name}">${a.name.replace(/\.[^.]+$/, '')}</span>
-          <div class="a-meta">
-            <span>${formatBytes(a.size)}${savedSize}</span>
-            ${isLoop ? '<span class="a-badge">loop activo</span>' : ''}
-            ${a.cached ? '<span class="a-cached">☁ sync</span>' : a.uploading ? '<span style="color:var(--yellow);font-size:.6rem">↑ subiendo…</span>' : ''}
+        <div class="a-body">
+          <div class="a-info">
+            <div class="a-label-row">
+              <input class="a-label-edit" id="alabel-${i}"
+                value="" placeholder="${a.name.replace(/\.[^.]+$/, '')}"
+                maxlength="40" title="Toca para editar el nombre del botón">
+              <span class="a-edit-hint">✏️</span>
+            </div>
+            <div class="a-meta">
+              <span>${formatBytes(a.size)}${savedSize}</span>
+              ${isLoop ? '<span class="a-badge">loop activo</span>' : ''}
+              ${a.cached ? '<span class="a-cached">☁</span>' : a.uploading ? '<span style="color:var(--yellow);font-size:.6rem">↑ subiendo…</span>' : ''}
+            </div>
+          </div>
+          <div class="a-actions">
+            <button class="a-stop-btn" data-stop="${i}" style="${isGloballyPlaying ? 'display:inline-flex' : 'display:none'}">■ Detener</button>
+            <button class="a-play-btn" data-play="${i}" ${playDisabled ? 'disabled' : ''}
+              title="${isGloballyPlaying ? 'Hay un audio reproduciéndose — detén primero' : ''}">▶ Reproducir</button>
+            <button class="a-queue-btn" data-queue="${i}" title="Agregar a cola" ${queueDisabled ? 'disabled' : ''}>+ Cola</button>
+            <div style="position:relative">
+              <button class="a-more-btn" data-more="${i}" title="Más opciones">⋯</button>
+              <div class="a-dropdown" id="dd-${i}">
+                <div class="dd-item ${isLoop ? 'loop-on' : ''}" data-loop="${i}">
+                  <span class="dd-icon">🔁</span>
+                  ${isLoop ? 'Detener loop' : 'Programar loop'}
+                </div>
+                <div class="dd-divider"></div>
+                <div class="dd-item danger" data-del="${i}">
+                  <span class="dd-icon">🗑</span>
+                  Eliminar audio
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="a-actions">
-          <button class="a-btn" title="Reproducir ahora" onclick="playNow(${i})" ${a.uploading ? 'disabled' : ''}>▶</button>
-          <button class="a-btn" title="Agregar a cola" onclick="addQueue(${i})" ${a.uploading ? 'disabled' : ''}>＋</button>
-          <button class="a-btn ${isLoop ? 'active' : ''}" title="Loop" onclick="toggleLoopConfig(${i})">🔁</button>
-          <button class="a-btn del" title="Eliminar" onclick="removeAudio(${i})">✕</button>
-        </div>
       </div>
-      ${a.uploading ? '<div class="a-progress"><div class="a-progress-fill" style="width:70%;animation:lsLoad 1.5s ease infinite alternate"></div></div>' : ''}
+      ${a.uploading ? '<div class="a-progress"><div class="a-progress-fill"></div></div>' : ''}
       <div class="loop-config${isLoop ? ' show' : ''}" id="loop-cfg-${i}">
         Repetir cada
         <input type="number" id="loop-interval-${i}" value="${a.loopInterval || 120}" min="5" max="3600">
         seg
-        <button class="loop-btn start" onclick="startLoop(${i})">Activar</button>
-        ${isLoop ? `<button class="loop-btn stop" onclick="stopLoop()">Detener</button>` : ''}
+        <button class="loop-btn start" data-startloop="${i}">Activar</button>
+        ${isLoop ? `<button class="loop-btn stop" data-stoploop="1">Detener</button>` : ''}
       </div>
     `;
+
+    // Set editable label value safely (avoids XSS via value attr)
+    const labelInput = item.querySelector(`#alabel-${i}`);
+    labelInput.value = displayLabel;
+
+    // Save label on blur or Enter
+    const saveLabelFn = () => {
+      const newLabel = labelInput.value.trim();
+      if (newLabel && newLabel !== (a.name.replace(/\.[^.]+$/, ''))) {
+        audios[i].label = newLabel;
+      } else if (!newLabel) {
+        delete audios[i].label;
+        labelInput.value = a.name.replace(/\.[^.]+$/, '');
+      } else {
+        delete audios[i].label;
+      }
+      saveCurrentProfile();
+    };
+    labelInput.addEventListener('blur', saveLabelFn);
+    labelInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); labelInput.blur(); }
+      if (e.key === 'Escape') { labelInput.value = displayLabel; labelInput.blur(); }
+    });
+
+    item.querySelector('[data-play]')?.addEventListener('click', () => playNow(i));
+    item.querySelector('[data-queue]')?.addEventListener('click', () => addQueue(i));
+    item.querySelector('[data-stop]')?.addEventListener('click', () => sendCmd('stop'));
+    item.querySelector('[data-more]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dd = document.getElementById(`dd-${i}`);
+      const isOpen = dd.classList.contains('open');
+      closeAnyDropdown();
+      if (!isOpen) { dd.classList.add('open'); openDropdownIdx = i; }
+    });
+    item.querySelector('[data-loop]')?.addEventListener('click', () => {
+      closeAnyDropdown();
+      toggleLoopConfig(i);
+    });
+    item.querySelector('[data-del]')?.addEventListener('click', () => {
+      closeAnyDropdown();
+      removeAudio(i);
+    });
+    item.querySelector('[data-startloop]')?.addEventListener('click', () => startLoop(i));
+    item.querySelector('[data-stoploop]')?.addEventListener('click', () => stopLoop());
+
     list.appendChild(item);
   });
 }
 
-window.playNow = (i) => {
-  activeLoopName = null;
-  sendCmd('play', audios[i]);
-};
-window.addQueue = (i) => sendCmd('queue', audios[i]);
-window.toggleLoopConfig = (i) => document.getElementById('loop-cfg-' + i).classList.toggle('show');
-window.startLoop = (i) => {
+function playNow(i) { activeLoopName = null; sendCmd('play', audios[i]); }
+function addQueue(i) { sendCmd('queue', audios[i]); }
+
+function toggleLoopConfig(i) {
+  document.getElementById('loop-cfg-' + i).classList.toggle('show');
+}
+
+function startLoop(i) {
   const interval = parseInt(document.getElementById('loop-interval-' + i).value) || 120;
   audios[i].loopInterval = interval;
   activeLoopName = audios[i].name;
   renderList();
   sendCmd('loop', audios[i], { interval });
-};
-window.stopLoop = () => { activeLoopName = null; sendCmd('stop'); };
+}
+
+function stopLoop() { activeLoopName = null; sendCmd('stop'); }
+
 window.removeAudio = async (i) => {
   if (!confirm('¿Eliminar "' + audios[i].name + '"?')) return;
   const name = audios[i].name;
+  const profileId = currentProfile ? currentProfile.id : null;
   audios.splice(i, 1);
   saveCurrentProfile();
   renderList();
-  updateMyStorage();
+  updateMyStorageDisplay();
   if (currentProfile) {
     try { await deleteAudioFromFirebase(currentProfile.id, name); } catch(e) {}
+    try {
+      await update(ref(db), {
+        cmd: { id: crypto.randomUUID(), action: 'delete', profileId, name, host: null }
+      });
+    } catch(e) {}
   }
 };
 
@@ -1270,15 +1421,32 @@ window.removeAudio = async (i) => {
 onValue(ref(db, 'state'), snap => {
   const s = snap.val() || {};
   systemPlaying = !!s.playing;
-  systemHost = s.currentHost || null;
+  systemCurrentHost = s.currentHost || null;
+  systemHost = systemCurrentHost;
 
-  document.getElementById('np-title').textContent = s.nowPlaying || '—';
-  const card = document.getElementById('now-playing-card');
-  card.classList.toggle('active', systemPlaying);
+  const bar = document.getElementById('now-playing-bar');
+  const titleEl = document.getElementById('np-title');
+  const hostEl = document.getElementById('np-host');
 
-  const blocked = systemPlaying && systemHost && systemHost !== (currentProfile ? currentProfile.name : null);
-  document.getElementById('blocked-banner').style.display = blocked ? 'block' : 'none';
-  document.getElementById('blocked-by').textContent = (systemHost || '') + ' está reproduciendo. Espera o usa "Detener".';
+  if (systemPlaying && s.nowPlaying && s.nowPlaying !== '—') {
+    bar.classList.add('active');
+    titleEl.textContent = s.nowPlaying.replace(/\.[^.]+$/, '');
+    hostEl.textContent = s.currentHost ? 'Reproduciendo: ' + s.currentHost : '';
+  } else {
+    bar.classList.remove('active');
+    titleEl.textContent = '—';
+    hostEl.textContent = '';
+  }
+
+  const myName = currentProfile ? currentProfile.name : null;
+  const blocked = systemPlaying && systemCurrentHost && systemCurrentHost !== myName;
+  const blockedBanner = document.getElementById('blocked-banner');
+  if (blocked) {
+    blockedBanner.classList.add('show');
+    document.getElementById('blocked-by').textContent = systemCurrentHost + ' está reproduciendo. Espera o usa "Detener".';
+  } else {
+    blockedBanner.classList.remove('show');
+  }
 
   document.getElementById('pause-btn').style.display = s.paused ? 'none' : '';
   document.getElementById('resume-btn').style.display = s.paused ? '' : 'none';
@@ -1286,52 +1454,182 @@ onValue(ref(db, 'state'), snap => {
   if (!systemPlaying && activeLoopName) { activeLoopName = null; renderList(); }
 });
 
-// ── SEND COMMAND (lightweight — no binary in cmd) ──────
+// ── SEND COMMAND ──────────────────────────────────────
 window.sendCmd = async function(action, audioObj = null, extra = {}) {
   const hostName = currentProfile ? currentProfile.name : 'Anónimo';
 
-  if ((action === 'play' || action === 'loop') && systemPlaying && systemHost && systemHost !== hostName) {
-    if (!confirm(systemHost + ' está reproduciendo. ¿Forzar?')) return;
+  if ((action === 'play' || action === 'loop') && systemPlaying && systemCurrentHost && systemCurrentHost !== hostName) {
+    if (!confirm(systemCurrentHost + ' está reproduciendo. ¿Forzar?')) return;
   }
 
-  const cmd = {
-    id: crypto.randomUUID(),
-    action,
-    host: hostName,
-    profileId: currentProfile ? currentProfile.id : null,
-    ...extra
-  };
+  const cmdId = crypto.randomUUID();
+  const cmd = { id: cmdId, action, host: hostName, profileId: currentProfile ? currentProfile.id : null, ...extra };
+  if (audioObj) { cmd.name = audioObj.name; cmd.mime = audioObj.mime; }
 
-  // Only send name + profileId, NOT the binary data
-  if (audioObj) {
-    cmd.name = audioObj.name;
-    cmd.mime = audioObj.mime;
-    // No cmd.data — player fetches from /audio/{profileId}/{name}
-  }
-
+  const patch = { cmd };
   if (action === 'play' || action === 'loop') {
-    await set(ref(db, 'state/nowPlaying'), audioObj ? audioObj.name : '—');
-    await set(ref(db, 'state/currentHost'), hostName);
-    await set(ref(db, 'state/playing'), true);
-    await set(ref(db, 'state/paused'), false);
+    patch['state/nowPlaying']  = audioObj ? audioObj.name : '—';
+    patch['state/currentHost'] = hostName;
+    patch['state/playing']     = true;
+    patch['state/paused']      = false;
+  } else if (action === 'pause') {
+    patch['state/paused']  = true;
+    patch['state/playing'] = false;
+  } else if (action === 'resume') {
+    patch['state/paused']  = false;
+    patch['state/playing'] = true;
+  } else if (action === 'stop') {
+    patch['state/playing']     = false;
+    patch['state/paused']      = false;
+    patch['state/currentHost'] = null;
+    patch['state/nowPlaying']  = '—';
+    activeLoopName = null;
+    renderList();
   }
-  if (action === 'pause') { await set(ref(db, 'state/paused'), true); await set(ref(db, 'state/playing'), false); }
-  if (action === 'resume') { await set(ref(db, 'state/paused'), false); await set(ref(db, 'state/playing'), true); }
-  if (action === 'stop') {
-    await set(ref(db, 'state'), { playing: false, paused: false, currentHost: null, nowPlaying: '—' });
-    activeLoopName = null; renderList();
-  }
-  await set(ref(db, 'cmd'), cmd);
+  await update(ref(db), patch);
 };
 
-// ── INIT ───────────────────────────────────────────────
-setTimeout(async () => {
+// ── COMPRESSION ───────────────────────────────────────
+async function compressAudio(file) {
+  const statusEl = document.getElementById('compress-status');
+  const textEl = document.getElementById('compress-text');
+  statusEl.style.display = 'flex';
+  statusEl.style.alignItems = 'center';
+  textEl.textContent = `Comprimiendo "${file.name}"…`;
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+    await audioCtx.close();
+
+    const targetSampleRate = 22050;
+    const offlineCtx = new OfflineAudioContext(1, Math.ceil(decoded.duration * targetSampleRate), targetSampleRate);
+    const src = offlineCtx.createBufferSource();
+    src.buffer = decoded; src.connect(offlineCtx.destination); src.start(0);
+    const rendered = await offlineCtx.startRendering();
+
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+      statusEl.style.display = 'none'; return null;
+    }
+
+    const wavBlob = audioBufferToWavBlob(rendered);
+    const wavUrl = URL.createObjectURL(wavBlob);
+
+    return new Promise((resolve) => {
+      const audio = new Audio(wavUrl);
+      const stream = audio.captureStream ? audio.captureStream() : audio.mozCaptureStream ? audio.mozCaptureStream() : null;
+      if (!stream) { statusEl.style.display = 'none'; resolve(null); return; }
+
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 32000 });
+      const chunks = [];
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        URL.revokeObjectURL(wavUrl);
+        const compressed = new Blob(chunks, { type: 'audio/webm' });
+        statusEl.style.display = 'none'; // ← fix: always hide on completion
+        resolve(compressed);
+      };
+
+      recorder.start(250);
+      audio.muted = true; audio.volume = 0; audio.play();
+      audio.onended = () => setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, 300);
+      setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, (decoded.duration + 3) * 1000);
+    });
+  } catch(e) {
+    document.getElementById('compress-status').style.display = 'none';
+    return null;
+  }
+}
+
+function audioBufferToWavBlob(buffer) {
+  const numCh = buffer.numberOfChannels, numSamples = buffer.length;
+  const sampleRate = buffer.sampleRate, bytesPerSample = 2;
+  const blockAlign = numCh * bytesPerSample, byteRate = sampleRate * blockAlign;
+  const dataSize = numSamples * blockAlign;
+  const ab = new ArrayBuffer(44 + dataSize);
+  const dv = new DataView(ab);
+  const writeStr = (offset, str) => { for(let i=0;i<str.length;i++) dv.setUint8(offset+i, str.charCodeAt(i)); };
+  writeStr(0,'RIFF'); dv.setUint32(4,36+dataSize,true); writeStr(8,'WAVE'); writeStr(12,'fmt ');
+  dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,numCh,true); dv.setUint32(24,sampleRate,true);
+  dv.setUint32(28,byteRate,true); dv.setUint16(32,blockAlign,true); dv.setUint16(34,bytesPerSample*8,true);
+  writeStr(36,'data'); dv.setUint32(40,dataSize,true);
+  let offset = 44; const ch = buffer.getChannelData(0);
+  for(let i=0;i<numSamples;i++) {
+    const s = Math.max(-1,Math.min(1,ch[i]));
+    dv.setInt16(offset, s<0?s*0x8000:s*0x7FFF, true); offset+=2;
+  }
+  return new Blob([ab],{type:'audio/wav'});
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────
+const fileInput = document.getElementById('file-input');
+fileInput.onchange = e => { handleFiles(e.target.files); fileInput.value = ''; };
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+
+async function handleFiles(files) {
+  const AUDIO_EXTS = /\.(mp3|wav|ogg|m4a|aac|flac|opus|webm|wma)$/i;
+  const EXT_MIME = {mp3:'audio/mpeg',mp4:'audio/mp4',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',wav:'audio/wav',flac:'audio/flac',opus:'audio/opus',webm:'audio/webm'};
+
+  for (const file of Array.from(files)) {
+    if (!file.type.startsWith('audio/') && !AUDIO_EXTS.test(file.name)) continue;
+    const ext = file.name.split('.').pop().toLowerCase();
+    const resolvedMime = (file.type && file.type.startsWith('audio/')) ? file.type : (EXT_MIME[ext] || 'audio/mpeg');
+
+    const existingIdx = audios.findIndex(a => a.name === file.name);
+    if (existingIdx !== -1) audios.splice(existingIdx, 1);
+
+    const totalBytes = audios.reduce((s, a) => s + (a.size || 0), 0);
+    if (totalBytes + file.size > PER_PROFILE_LIMIT_MB * 1048576) {
+      alert('⚠️ Límite de ' + PER_PROFILE_LIMIT_MB + ' MB alcanzado. Elimina audios para agregar más.');
+      continue;
+    }
+
+    const uploadToken = crypto.randomUUID();
+    audios.push({ name: file.name, mime: resolvedMime, size: file.size, loopInterval: 120, cached: false, uploading: true, _token: uploadToken });
+    renderList(); updateMyStorageDisplay();
+
+    let finalBlob = null, finalMime = resolvedMime;
+    try {
+      const compressed = await compressAudio(file);
+      if (compressed && compressed.size < file.size * 0.85) { finalBlob = compressed; finalMime = 'audio/webm'; }
+    } catch(e) {}
+    if (!finalBlob) finalBlob = file;
+
+    const b64 = await new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = ev => res(ev.target.result.split(',')[1]);
+      reader.readAsDataURL(finalBlob);
+    });
+
+    try {
+      await uploadAudioToFirebase(currentProfile.id, file.name, b64, finalMime);
+      const idx = audios.findIndex(a => a._token === uploadToken);
+      if (idx !== -1) { audios[idx].cached = true; audios[idx].uploading = false; audios[idx].compressedSize = finalBlob.size; delete audios[idx]._token; }
+    } catch(e) {
+      const idx = audios.findIndex(a => a._token === uploadToken);
+      if (idx !== -1) { audios[idx].uploading = false; delete audios[idx]._token; }
+      alert('Error al subir "' + file.name + '": ' + e.message);
+    }
+
+    saveCurrentProfile(); renderList(); updateMyStorageDisplay();
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────
+Promise.all([
+  loadProfiles(),
+  new Promise(res => setTimeout(res, 1400))
+]).then(() => {
   document.getElementById('splash').classList.add('hidden');
   document.getElementById('profile-screen').style.display = 'block';
-  await loadProfiles();
-  startProfileSync(); // listen for real-time profile changes from other devices
+  startProfileSync();
   autoRestore();
-}, 1500);
+});
 </script>
 </body>
 </html>
